@@ -3,12 +3,12 @@
 This repository contains the work I have done for my master thesis at University of British Columbia. It's a machine learning project on testing whether SVD could be used to find related articles by using only the keywords inside the abstracts of each article and finding what parameters work the best with SVD.
 
 Here are the basic steps for each different experiment
-1) Use the downloaded papers from MedLine or PubMed API and extract key biomedical terms
-2) Create a document-term matrix using an appropriate TF-IDF function
-3) Perform SVD with GraphLab, with a chosen number of singular values
-4) Measure row-row distances in the decomposed matrix that represent the document space
-5) Find the closest rows for the rows corresponding to the target papers
-6) Compare the predictions with the PubMed database or human annotations (future)
+- Use the downloaded papers from MedLine or PubMed API and extract key biomedical terms
+- Create a document-term matrix using an appropriate TF-IDF function
+- Perform SVD with GraphLab, with a chosen number of singular values
+- Measure row-row distances in the decomposed matrix that represent the document space
+- Find the closest rows for the rows corresponding to the target papers
+- Compare the predictions with the PubMed database or human annotations (future)
 
 # For reproducibility
 
@@ -46,4 +46,4 @@ Testing if cosine distances measured from the decomposed matrices are bimodal an
 
 ## Medline_13M
 
-SVD on all the papers available on MedLine (until March 2015), excluding the ones that do not have abstracts. 
+SVD on all the papers available on MedLine (until March 2015), excluding the ones that do not have abstracts.
