@@ -16,9 +16,9 @@ Here are the basic steps for each different experiment
 
 Contains any write-ups, presentations, poster, reports, etc.
 
-## Supplementary_Tools
+## Shared
 
-Contains instructions on obtaining third-party tools and resources (eg. GraphLab, geniatagger, the biomedical phrase list, Medline papers), as well as code written by other lab members.
+Contains shared resources such as common code used by different experiment, instructions on obtaining third-party tools and resources (eg. GraphLab, geniatagger, the biomedical phrase list, Medline papers), as well as code written by other lab members.
 
 # Directories for different experiments
 
