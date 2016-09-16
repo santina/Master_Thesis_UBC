@@ -1,0 +1,147 @@
+---
+title: 'Evaluation: multiple instances of PubMed Experiments'
+author: "Santina Lin"
+date: "January 29, 2016"
+output: 
+  html_document: 
+    keep_md: yes
+    toc: yes
+---
+
+This shows the result of 92 repeats of [this experiment](result.md). 
+The data are split by the type of matrices in order to decrease the time of processing 
+
+# Data preparation and inspection
+
+```{r}
+library(ggplot2)
+library(plyr)
+library(dplyr)
+library(knitr) # kable()
+```
+First load the data 
+```{r}
+# A function to prepare the data 
+prepare_data <- function(filepath){
+  data <- read.table(filepath)  # read in the file 
+  colnames(data) <- c("ExperimentNum", "distFunc", "nsv", "precision", "seconds") # Set the column name 
+  data$ExperimentNum <- as.factor(data$ExperimentNum) # Make sure experiment numbers are factors
+  data 
+}
+
+term_frequency <- prepare_data("../multiple_instances/term_freq.gphost03.result") 
+term_binary <- prepare_data("../multiple_instances/term_binary.gphost03.result")
+tf_idf <- prepare_data("../multiple_instances/tf_idf.gphost03.result")
+```
+
+Slight inspection of the data 
+```{r}
+str(tf_idf)
+str(term_binary)
+str(term_frequency)
+unique(tf_idf$nsv)  # see what are the numbers of singular values that I measured 
+```
+
+As we can see that there are `r nrow(tf_idf)` observations. That's because we have two different distance metrics, `r length(unique(tf_idf$nsv))` different numbers of singular values, and all these are repeated over `r length(unique(tf_idf$ExperimentNum))` experiments. This is the same for all three dataset. Each is for a different input matrix into Graphlab. 
+
+Lastly, we'll combine all three dataframes 
+
+```{r}
+tf_idf$matrixType <- factor("TF-IDF")
+term_binary$matrixType <- factor("Binary")
+term_frequency$matrixType <- factor("Frequency")
+all_result <- rbind(tf_idf, term_binary, term_frequency)
+str(all_result) # inspect final dataframe
+```
+
+
+# Average recalls curves 
+
+The lines are the means of precisions from 92 different experiments for a given singular values. We can see that the performance is fairly consistent across any randomly chosen 100 PMIDs. 
+
+```{r}
+create_curves <- function(data, graphTitle){
+  ggplot(data, aes(x=nsv, y=precision, colour=distFunc)) + geom_point(alpha=0.1) + 
+  facet_grid(matrixType ~ .) + theme_bw() + ggtitle(graphTitle) + scale_x_continuous(expand = c(0, 0), breaks=seq(0, 1500, by=100)) + 
+  labs(x="# singular values",y="Average precision") +
+  theme(plot.title = element_text(color="#666666", face="bold", size=16, hjust=0.2, vjust=1))+ 
+  stat_summary(fun.y = mean, geom="line", size=1.5)
+}
+create_curves(all_result, "Average precisions in retrieving related PubMed articles")
+```
+
+To see the average maxima for each combinations of parameters: 
+```{r}
+# Calculate mean precisions  
+all_result_means <- ddply(all_result, c("distFunc", "matrixType", "nsv"), summarise,
+      precision = mean(precision), meanTime = mean(seconds))
+
+maxima <- aggregate(precision ~ matrixType + distFunc, max, data=all_result_means)  # see maximum of all combinations 
+maxima <- merge(maxima, all_result_means[, c("matrixType", "nsv", "precision")], by=c("matrixType", "precision")) # bring in the number of nsv 
+maxima <- arrange(maxima, matrixType, distFunc)[, c(1,3,4,2)] # arrange the dataframe
+kable(maxima, format="markdown") # ensure Github can render the table
+```
+
+As demosntrated in the code: I first take the mean of precisions across all samples, for each unique combination of sample number, nsv, distance function, and matrix type. So basically an average for 92 different points. Then I get the maxima prececisions across all number of singular values for each unique combination of distance function and matrixtype. That way we know, on average, at what nsv are the maxima precision is achieved. 
+
+# Distribution of max precision 
+
+Here we take the maxima precision across all number of singular values in each sample. So we should have 92 maxima points for each combination of distance function and matrix type. 
+
+```{r}
+max_mean <- aggregate(precision ~ matrixType + ExperimentNum + distFunc, max, data=all_result)  # see maximum of all combinations 
+ggplot(max_mean, aes(x=distFunc, y=precision, fill=distFunc)) + geom_boxplot(show.legend = FALSE) + 
+  theme_bw() + facet_wrap(~matrixType) + labs(y="maximum precisions",x="distance function") + 
+  theme(legend.title = element_text(size=14), 
+        legend.text = element_text(size=14),
+        axis.text = element_text(size=12), 
+        axis.title = element_text(size=14), 
+        strip.text.x = element_text(size=14))
+```
+
+
+```{r, echo=FALSE, eval=FALSE}
+plot_boxplot <- function(data){
+  ggplot(data, aes(x=distFunc, y=precision, fill=distFunc)) + geom_boxplot(show.legend = FALSE) + theme_bw()
+}
+by(max_mean, max_mean$matrixType, plot_boxplot) # generate one plot at a time
+```
+
+
+```{r}
+# Get standard deviation 
+max_mean_sd <- ddply(max_mean, c("matrixType", "distFunc"), summarise,
+      avg_max_precision = mean(precision), sd = sd(precision))
+kable(max_mean_sd, format="markdown") # ensure Github can render the table
+
+```
+
+# Distribution of nsv at maxima precision 
+
+Here we take the nsv at which maxima precision occcurs across all number of singular values in each sample. So we should have 92 nsv points for each combination of distance function and matrix type. 
+
+```{r}
+maxima_nsv <- merge(max_mean, all_result[, c("precision", "nsv")], by="precision") # bring in the number of nsv 
+ggplot(maxima_nsv, aes(x=distFunc, y=nsv, fill=distFunc)) + geom_boxplot(show.legend = FALSE) + 
+  theme_bw() + facet_wrap(~matrixType) + labs(y="# singular values at maximum precision",x="distance function")+ 
+  theme(legend.title = element_text(size=14), 
+        legend.text = element_text(size=14),
+        axis.text = element_text(size=12), 
+        axis.title = element_text(size=14), 
+        strip.text.x = element_text(size=14))
+```
+
+```{r}
+max_nsv_sd <- ddply(maxima_nsv, c("matrixType", "distFunc"), summarise,
+      avg_max_nsv = mean(nsv), sd = sd(nsv))
+kable(max_nsv_sd, format="markdown") # ensure Github can render the table
+```
+
+# Running time
+
+This is to see how long the calculation takes. So it looks like using cosine function is not only more accurate but also takes less time. 
+
+```{r}
+ggplot(all_result_means, aes(x=nsv, y=meanTime, colour=distFunc)) + geom_point() + facet_grid(matrixType ~ .) + 
+  theme_bw() + labs(x="number of singular values", y="average time") 
+```

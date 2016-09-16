@@ -1,0 +1,56 @@
+---
+title: "Evaluation of SVD on PubMed data"
+author: "Santina Lin"
+date: "January 6, 2016"
+output: 
+  html_document: 
+    keep_md: yes
+---
+  
+```{r warning=FALSE}
+library(ggplot2)
+library(plyr) # mutate(), mapvalues()
+library(knitr) # kable()
+```
+
+# Description of the data 
+
+Most similar abstracts for 100 randomly chosen PubMed abstracts have been downloaded using the Bio.Entrez python package, producing about a dataset of 12240 abstracts. I used LSA on this dataset to see how well SVD can be used to retrieve back the related articles. 
+
+# Results - Take 1 
+
+Simply taking different combination of matrices (on frequency of terms), number of singular values, and two different similarity function, to see the recall (or precision, in this case they're the same).
+
+First let me prepare the data 
+```{r warning=FALSE}
+# Load data 
+result <- read.table("results_avg_recall.txt")
+colnames(result) <- c("matrixType", "distFunc", "nsv", "precision")
+head(result)
+
+# Increase readability 
+result$matrixType <- mapvalues(result$matrixType, from = c("tf_idf", "term_freq", "term_freq_binary"), to = c("TF-IDF", "Term Frequency", "Binary"))
+head(result)
+```
+
+
+Now see the graph.
+
+```{r}
+ggplot(result, aes(x=nsv, y=precision, colour=distFunc)) + geom_point() + 
+  facet_grid(matrixType ~ .) + theme_bw() + ggtitle("Average recall on 100 PubMed abstracts' most similar abstracts") +
+  labs(x="Number of singular values",y="Average recall") +
+  theme(plot.title = element_text(color="#666666", face="bold", size=14, hjust=0.5, vjust=1))
+```
+
+See where the maxima were obtained 
+```{r}
+maxima <- aggregate(precision ~ matrixType + distFunc, max, data=result)  # see maximum of all combinations 
+maxima <- merge(maxima, result[, c("precision", "nsv")], by="precision") # bring in the number of nsv 
+maxima <- arrange(maxima, matrixType) # arrange the dataframe
+kable(maxima, format="markdown") # ensure Github can render the table
+```
+
+In this example, precision is the same as recall because I already know how many related articles are there for each of the 100 PubMed abstracts. 
+
+# Discussion 

@@ -1,0 +1,132 @@
+---
+title: "Scaling the matrix"
+author: "Santina Lin"
+date: "February 24, 2016"
+output: 
+  html_document: 
+    keep_md: yes
+    toc: yes
+---
+
+This markdown is to look at how scaling the matrix with singular values or square root of singular values yield different precisions. 
+So far I've been using square root. However, Sita said we should use singular values, with some hand waving. I don't understand the math enough to prove one or the other, so I'll use an experimental method to see which one is best fitting for finding relevant PubMed papers. 
+
+
+```{r message=FALSE}
+library(plyr)
+library(dplyr)
+library(ggplot2)
+library(knitr)
+```
+
+## Load and Inspect the data
+
+Since from the [previous experiment](result_multiple.md), we already know that cosine and tf-idf are the best. I only repeat the experiment using these two metrics on various number of singular values on matrix scaled by singular values. 
+
+```{r}
+prepare_data <- function(filepath){
+  data <- read.table(filepath)  # read in the file 
+  colnames(data) <- c("ExperimentNum", "distFunc", "nsv", "precision", "seconds") # Set the column name 
+  data$ExperimentNum <- as.factor(data$ExperimentNum) # Make sure experiment numbers are factors
+  data 
+}
+
+tf_idf <- prepare_data("../multiple_instances/tf_idf.gphost03.result")   # data from the other experiment in which matrices were scaled by square roots of singular values 
+tf_idf_nonsqrt <- prepare_data("../multiple_instances/tf_idf_nonsqrtsv.hugin.result") # same procedure but this time the matrix was scaled by singular values 
+tf_idf <- tf_idf[tf_idf$distFunc=="Cosine", ] # Keep only the ones using cosine function 
+
+str(tf_idf)
+str(tf_idf_nonsqrt)
+```
+
+```{r echo=FALSE}
+# command: 
+# python /projects/slin_prj/slin_prj_results/PubMed_Experiment/random_100_pubmed/code/get_precisions.py --f /projects/slin_prj/PubMed_Experiment/random_100_pubmed_repeats/GraphLab_Outputs/tf_idf --a /projects/slin_prj/PubMed_Experiment/random_100_pubmed_repeats/all_abstracts --o /projects/slin_prj/slin_prj_results/PubMed_Experiment/random_100_pubmed/multiple_instances/tf_idf_nonsqrtsv.hugin.result > /projects/slin_prj/slin_prj_results/PubMed_Experiment/random_100_pubmed/multiple_instances/tf_idf_nonsqrtsv.hugin.result.log 
+```
+
+Combine the two dataframe together 
+```{r}
+tf_idf$scaling <- factor("Square root")
+tf_idf_nonsqrt$scaling <- factor("Not square root")
+data <- rbind(tf_idf_nonsqrt, tf_idf)
+str(data)
+```
+
+## Graphing of all the precision (or recall )
+
+```{r}
+library(ggplot2)
+create_curves <- function(data, graphTitle){
+  ggplot(data, aes(x=nsv, y=precision, colour=scaling)) + geom_point(alpha=0.1) + 
+  theme_bw() + ggtitle(graphTitle) + scale_x_continuous(expand = c(0, 0), breaks=seq(0, 1500, by=100)) + 
+  labs(x="# singular values",y="Average precision") +
+  theme(plot.title = element_text(color="#666666", face="bold", size=14, hjust=0.5, vjust=1))+ 
+  stat_summary(fun.y = mean, geom="line", size=1.5)
+}
+create_curves(data, "Average precisions in retrieving related PubMed articles")
+```
+
+Look at more specifically at some details in the graph 
+
+```{r}
+# Calculate mean precisions  
+all_result_means <- ddply(data, c("scaling", "nsv"), summarise,
+      precision = mean(precision), meanTime = mean(seconds))
+
+maxima <- aggregate(precision ~ scaling, max, data=all_result_means)  # see maximum of all combinations 
+maxima <- merge(maxima, all_result_means[, c("nsv", "precision")], by="precision") # bring in the number of nsv 
+kable(maxima, format="markdown") # ensure Github can render the table
+```
+
+## Distribution of max precision 
+
+Let's look at the spread of maximum precisions from each of the 92 experiment using two different scaling methods. 
+
+```{r}
+max_mean <- aggregate(precision ~ scaling + ExperimentNum, max, data=data)  # see maximum of all combinations 
+ggplot(max_mean, aes(x=scaling, y=precision, fill=scaling)) + geom_boxplot(show.legend = FALSE) + 
+  theme_bw() + labs(y="maximum precisions",x="scaling") + 
+  theme(axis.text = element_text(size=12), 
+        axis.title = element_text(size=14))
+```
+
+Look at whether they're actually different 
+```{r}
+t.test(max_mean[max_mean$scaling=="Square root", "precision"], max_mean[max_mean$scaling=="Not square root", "precision"], alternative="less")
+```
+
+Look at the numbers 
+
+```{r}
+max_mean_sd <- ddply(max_mean, "scaling", summarise,
+      avg_max_precision = mean(precision), sd = sd(precision))
+kable(max_mean_sd, format="markdown") # ensure Github can render the table
+``` 
+
+
+## Distribution of of nsv at maxima precision
+Here we take the nsv at which maxima precision occcurs across all number of singular values in each sample. So we should have 92 nsv points each of the scaling methods.
+
+```{r}
+maxima_nsv <- merge(max_mean, data[, c("precision", "nsv")], by="precision") # bring in the number of nsv 
+ggplot(maxima_nsv, aes(x=scaling, y=nsv, fill=scaling)) + geom_boxplot(show.legend = FALSE) + 
+  theme_bw() + labs(y="# singular values at maximum precision",x="distance function") + 
+  theme(axis.text = element_text(size=12), 
+        axis.title = element_text(size=14))
+``` 
+
+Look at whether they're actually different 
+```{r}
+t.test(maxima_nsv[max_mean$scaling=="Square root", "nsv"], maxima_nsv[max_mean$scaling=="Not square root", "nsv"], alternative="less")
+```
+
+
+Standard deviation 
+
+```{r}
+max_nsv_sd <- ddply(maxima_nsv, "scaling", summarise,
+      avg_max_nsv = mean(nsv), sd = sd(nsv))
+kable(max_nsv_sd, format="markdown") # ensure Github can render the table
+```
+
+

@@ -1,0 +1,500 @@
+  141  ls
+  142  subl testbench.py
+  143  cd slin-closest/
+  144  sl
+  145  ls
+  146  head slin.closest-coords.0 
+  147  clear
+  148  head -1 slin.closest-coords.0 
+  149  pwd
+  150  top
+  151  ssh munin
+  152  ls
+  153  cd ..
+  154  ls
+  155  mkdir slin-closest_2000
+  156  ls
+  157  ssh munin
+  158  top
+  159  top -H
+  160  pwd
+  161  cd /projects/edcc_prj2/sita/
+  162  ls
+  163  cd bigdata/
+  164  ls
+  165  cd SVDReconstruct/
+  166  ls
+  167  cd CosineSimilarity/
+  168  ls
+  169  cd ..
+  170  cp CosineSimilarity/ /projects/slin_prj/
+  171  cp CosineSimilarity /projects/slin_prj/
+  172  cp CosineSimilarity/* /projects/slin_prj/CosineSimilarity
+  173  mkdir /projects/slin_prj/CosineSimilarity
+  174  cp CosineSimilarity/* /projects/slin_prj/CosineSimilarity/
+  175  ls /projects/slin_prj/CosineSimilarity/
+  176  cp -r CosineSimilarity/* /projects/slin_prj/CosineSimilarity/
+  177  ls /projects/slin_prj/CosineSimilarity/
+  178  cd /projects/slin_prj/CosineSimilarity/
+  179  ls
+  180  clear
+  181  ls
+  182  ./track_release -nV:12440 -eigen-values:/projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.singular_values -vectors:/projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.U.1_of_1 -dim:1500 -track:101 -block-size:500 -prefix:./slin-closest/slin.closest-coords : 1500nsv_closest
+  183  ls
+  184  cat gcc-0.5.3 
+  185  source gcc-0.5.3 
+  186  ./track_release -nV:12440 -eigen-values:/projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.singular_values -vectors:/projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.U.1_of_1 -dim:1500 -track:101 -block-size:500 -prefix:./slin-closest/slin.closest-coords : 1500nsv_closest
+  187  clear
+  188  less /projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.singular_values
+  189  head -1501 /projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.singular_values > test.1500
+  190  ./track_release -nV:12440 -eigen-values:./test.1500 -vectors:/projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.U.1_of_1 -dim:1500 -track:101 -block-size:500 -prefix:./slin-closest/slin.closest-coords : 1500nsv_closest
+  191  cat ./slin-closest/*
+  192  rm -rf ./slin-closest/
+  193  ./track_release -nV:12440 -eigen-values:./test.1500 -vectors:/projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.U.1_of_1 -dim:1500 -track:101 -block-size:500 -prefix:./slin-closest/slin.closest-coords : 1500nsv_closest
+  194  rm -rf ./slin-closest/
+  195  mkdir ./slin-closest
+  196  ls -ltr
+  197  rm -rf slin-closest/
+  198  sl -ltr
+  199  ls -ltr
+  200  mkdir ./slin-closest
+  201  sl -ltr
+  202  ls -ltr
+  203  ls -ltr ./slin-closest/
+  204  ./track_release -nV:12440 -eigen-values:./test.1500 -vectors:/projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.U.1_of_1 -dim:1500 -track:101 -block-size:500 -prefix:./slin-closest/slin.closest-coords
+  205  rm -rf ./slin-closest/
+  206  mkdir ./slin-closest-2000/
+  207  rm -rf ./slin-closest-2000/
+  208  mkdir ./slin-closest-1500
+  209  ./track_release -nV:12440 -eigen-values:./test.1500 -vectors:/projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.U.1_of_1 -dim:1500 -track:101 -block-size:500 -prefix:./slin-closest/slin.closest-coords &> ./log.1500
+  210  rm -rf ./slin-closest-1500/
+  211  mkdir ./slin-closest-1500/
+  212  ls ./slin-closest-1500/
+  213  ./track_release -nV:12440 -eigen-values:./test.1500 -vectors:/projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.U.1_of_1 -dim:1500 -track:101 -block-size:500 -prefix:./slin-closest-1500/slin.closest-coords-1500  &> ./log.1500
+  214  cat log.1500 
+  215  ls slin-closest-1500/
+  216  ls
+  217  cd slin-closest-1500/
+  218  ls
+  219  head slin.closest-coords-1500.0 
+  220  head -1 slin.closest-coords-1500.0 
+  221  clear
+  222  head -1 slin.closest-coords-1500.0 
+  223  clear
+  224  head -1 slin.closest-coords-1500.0 
+  225  ls
+  226  pwd
+  227  cd ..
+  228  ls
+  229  head track_release.Tue.Jan.26.22.33.02.PST.2016-munin.bcgsc.ca.nohup.out 
+  230  ls
+  231  wc -l vectors.test 
+  232  cd slin-closest-1500/
+  233  ls
+  234  pwd
+  235  ls
+  236  head -1 my_own_answer_1500.txt 
+  237  wc -l my_own_answer_1500.txt 
+  238  wc my_own_answer_1500.txt 
+  239  ls
+  240  wc -l slin.closest-coords-1500.0
+  241  clear
+  242  ls
+  243  head -1 my_own_answer_1500.txt 
+  244  wc -l slin.closest-coords-1500.0
+  245  tail -1 slin.closest-coords-1500.0
+  246  tail -1 slin.closest-coords-1500.24
+  247  clear
+  248  head -1 my_own_answer_1500.txt 
+  249  head -1 slin.closest-coords-1500.4
+  250  head -1 slin.closest-coords-1500.16
+  251  sed '480q;d' slin.closest-coords-1500.16
+  252  clear
+  253  sed '480q;d' slin.closest-coords-1500.16
+  254  head -1 my_own_answer_1500.txt 
+  255  pwd
+  256  wc -l my_own_answer_1500.txt 
+  257  wc -l my_own_answer_1500_notsquare.txt 
+  258  head -1 my_own_answer_1500_notsquare.txt 
+  259  ls
+  260  cd ..
+  261  ls
+  262  subl track_release.Tue.Jan.26.22.33.02.PST.2016-munin.bcgsc.ca.nohup.out 
+  263  pwd
+  264  cd /projects/slin_prj/slin_prj_results/PubMed_Experiment/random_100_pubmed_repeats/
+  265  ls
+  266  wc -l *
+  267  head tf_idf.gphost03.result.log 
+  268  head tf_idf.gphost03.result.log 
+  269  wc -l *
+  270  subl /projects/slin_prj/slin_prj_results/PubMed_Experiment/random_100_pubmed_repeats/tf_idf.gphost03.result.log
+  271  cd /projects/slin_prj/slin_prj_results/PubMed_Experiment/random_100_pubmed_repeats
+  272  ls
+  273  subl take1/tf_idf.result 
+  274  subl /projects/slin_prj/slin_prj_results/PubMed_Experiment/random_100_pubmed_repeats/tf_idf.gphost03.result.log
+  275  subl /projects/slin_prj/slin_prj_results/PubMed_Experiment/random_100_pubmed_repeats/tf_idf.gphost03.result
+  276  ls
+  277  wc -l *
+  278  head term_binary.gphost03.result
+  279  wc -l *
+  280  wc -l *
+  281  wc -l *
+  282  wc -l *
+  283  screen
+  284  screen -r
+  285  screen -r 20976.ttys018.pbose02
+  286  cd ..
+  287  pwd
+  288  cd /projects/slin_prj/PubMed_Experiment/
+  289  ls
+  290  cd random_100_pubmed
+  291  ls
+  292  cd closest_papers/
+  293  ls
+  294  cd term_freq
+  295  ls
+  296  cd cosine/
+  297  ls
+  298  head -1 cosine_1500.neighbors 
+  299  grep 21120184 cosine_1500.neighbors 
+  300  subl /projects/slin_prj/CosineSimilarity/track_release.Tue.Jan.26.22.33.02.PST.2016-munin.bcgsc.ca.nohup.out 
+  301  cd ../..
+  302  ls
+  303  cd ..
+  304  ls
+  305  cd data/
+  306  ls
+  307  wc -l abstracts
+  308  wc -l abstracts.txt 
+  309  head -1 abstracts.txt 
+  310  sed '9q;d' abstracts.txt 
+  311  sed '10q;d' abstracts.txt 
+  312  sed '4067q;d' abstracts.txt 
+  313  sed '10q;d' abstracts.txt 
+  314  sed '4067q;d' abstracts.txt 
+  315  sed '73q;d' abstracts.txt 
+  316  sed '5q;d' abstracts.txt 
+  317  sed '4067q;d' abstracts.txt 
+  318  sed '3q;d' abstracts.txt 
+  319  sed '9q;d' abstracts.txt 
+  320  sed '10q;d' abstracts.txt 
+  321  sed '4067q;d' abstracts.txt 
+  322  cd 
+  323  cd /projects/slin_prj/slin_prj_results/PubMed_Experiment/
+  324  ls
+  325  cd random_100_pubmed
+  326  ls
+  327  cd code/
+  328  ls
+  329  cd ..
+  330  cd code/
+  331  ls
+  332  mkdir houseKeeping
+  333  rm -r houseKeeping/
+  334  mkdir sanityCheck
+  335  mv checkIDs.py sanityCheck/
+  336  mv concate.py  sanityCheck/
+  337  mv check*.py sanityCheck/
+  338  ls
+  339  mv frobenius.py sanityCheck/
+  340  mv findRepeats.py sanityCheck/
+  341  ls
+  342  cd sanityCheck/
+  343  python find_closest_oneNSV.py --m /projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.U.1_of_1 --s /projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.singular_values --a /projects/slin_prj/PubMed_Experiment/random_100_pubmed/data/abstracts.txt --out /projects/slin_prj/CosineSimilarity/slin-closest-1500/my_own_answer_1500.txt
+  344  python find_closest_oneNSV.py --m /projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.U.1_of_1 --s /projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.singular_values --a /projects/slin_prj/PubMed_Experiment/random_100_pubmed/data/abstracts.txt --out /projects/slin_prj/CosineSimilarity/slin-closest-1500/my_own_answer_1500.txt --nsv 1500
+  345  python find_closest_oneNSV.py --m /projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.U.1_of_1 --s /projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.singular_values --a /projects/slin_prj/PubMed_Experiment/random_100_pubmed/data/abstracts.txt --out /projects/slin_prj/CosineSimilarity/slin-closest-1500/my_own_answer_1500.txt --nsv 1500
+  346  python find_closest_oneNSV.py --m /projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.U.1_of_1 --s /projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.singular_values --a /projects/slin_prj/PubMed_Experiment/random_100_pubmed/data/abstracts.txt --out /projects/slin_prj/CosineSimilarity/slin-closest-1500/my_own_answer_1500.txt --nsv 1500
+  347  python find_closest_oneNSV.py --m /projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.U.1_of_1 --s /projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.singular_values --a /projects/slin_prj/PubMed_Experiment/random_100_pubmed/data/abstracts.txt --out /projects/slin_prj/CosineSimilarity/slin-closest-1500/my_own_answer_1500.txt --nsv 1500
+  348  ls
+  349  python check_intersect.py 
+  350  ls
+  351  pwd
+  352  pwd
+  353  cd ..
+  354  cd sanityCheck/
+  355  pwd
+  356  python find_closest_oneNSV.py --m /projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.U.1_of_1 --s /projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.singular_values --a /projects/slin_prj/PubMed_Experiment/random_100_pubmed/data/abstracts.txt --out /projects/slin_prj/CosineSimilarity/slin-closest-1500/my_own_answer_1500_notsquare.txt --nsv 1500
+  357  python check_intersect.py 
+  358  python check_intersect.py 
+  359  cd
+  360  cd /projects/slin_prj/PubMed_Experiment/random_100_pubmed
+  361  ls
+  362  cd data
+  363  ls
+  364  cd ..
+  365  ls
+  366  cd GraphLab_SVD_outputs/
+  367  ls
+  368  cd ..
+  369  ls
+  370  cd da
+  371  cd data
+  372  ls
+  373  wc -l abstracts.txt 
+  374  wc -l /projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.U.1_of_1 
+  375  pwd
+  376  head abstracts.txt
+  377  ls
+  378  clear
+  379  ls
+  380  head -1 abstracts.txt
+  381  ls
+  382  cd ..
+  383  ls
+  384  ls
+  385  cd data/
+  386  ls
+  387  grep 21120184 abstracts.txt
+  388  grep 21120184 abstracts.txt  | head -1
+  389  python
+  390  ls
+  391  cd /projects/slin_prj/
+  392  ls
+  393  cd PMC
+  394  ls
+  395  cd term_freq/
+  396  ls
+  397  cd pmc/
+  398  ls
+  399  cd ..
+  400  ls
+  401  cd .
+  402  cd ..
+  403  ls
+  404  cd ..
+  405  ls
+  406  cd slin_prj_results/
+  407  ls
+  408  cd .
+  409  ls
+  410  cd 
+  411  cd Thesis/
+  412  ls
+  413  cd data/
+  414  ls
+  415  cd metadata_pmc/
+  416  ls
+  417  pwd
+  418  wc -l metaData_pmcPapers_hasAbstract.txt 
+  419  ls
+  420  pwd
+  421  cd ..
+  422  ls
+  423  ls
+  424  ls
+  425  cd /projects/slin_prj/PubMed_Experiment/shallow_vs_deep/
+  426  ls
+  427  cd data/
+  428  ls
+  429  cd abstracts/
+  430  ls
+  431  cd ..
+  432  cd term_extracted/
+  433  ls
+  434  cd ..
+  435  ls
+  436  cd ..
+  437  ls
+  438  cd closest_papers/
+  439  ls
+  440  cd ..
+  441  ls
+  442  cd matrices/
+  443  ls
+  444  ls *
+  445  cd ..
+  446  ls *
+  447  pwd
+  448  ls data/*
+  449  cd data/pmids/
+  450  ls
+  451  wc -l secondLevel.abstracts 
+  452  ssh hugin
+  453  cd /projects/slin_prj/PubMed_Experiment/shallow_vs_deep/
+  454  cd data/pmids/
+  455  wc -l secondLevel.abstracts 
+  456  ls
+  457  cd ..
+  458  ls
+  459  cd term_extracted/
+  460  ls
+  461  wc -l *
+  462  cd ..
+  463  ls
+  464  cd pmids
+  465  ls
+  466  head -1 closestPaperIDs_second_noFirstLevel.txt 
+  467  head -1 closestPaperIDs_second_noFirstLevel.txt | wc 
+  468  ls
+  469  wc -l *
+  470  head -1 closestPaperIDs.txt
+  471  wc closestPaperIDs.txt
+  472  wc closestPaperIDs_woRepeats.txt 
+  473  ls
+  474  wc closestPaperIDs_second*
+  475  wc -l secondLevel_ommittedIDs.txt 
+  476  head -1 secondLevel_ommittedIDs.txt 
+  477  wc secondLevel_ommittedIDs.txt 
+  478  ls
+  479  wc closestPaperIDs_second_*
+  480  wc closestPaperIDs_second*
+  481  cd /projects/slin_prj/
+  482  ls
+  483  cd PMC/
+  484  ls
+  485  cd term_freq/
+  486  ls
+  487  cd pmc
+  488  ls
+  489  wc -l *
+  490  ls
+  491  cd /projects/slin_prj/
+  492  ls
+  493  cd PubMed_Experiment/
+  494  ls
+  495  cd random_100_pubmed_repeats/
+  496  ls
+  497  cd all_abstracts/
+  498  ls
+  499  head -1 random_pmids_56.neighbors.all 
+  500  wc -l *
+  501  cd
+  502  cd Repos/
+  503  ls
+  504  cd /projects/slin_prj/slin_prj_results/PubMed_Experiment/
+  505  ls
+  506  cd random_100_pubmed
+  507  ls
+  508  cd ..
+  509  ls
+  510  ls random_100_pubmed_repeats/
+  511  rm -r random_100_pubmed_repeats/
+  512  ls
+  513  cd random_100_pubmed/
+  514  ls
+  515  git status
+  516  git add results/*
+  517  git commit -m "Added results of multiple instances" 
+  518  git push origin master
+  519  git status
+  520  git add *
+  521  git status
+  522  git reset
+  523  git status
+  524  cd multiple_instances/
+  525  ls
+  526  cd take1/
+  527  ls
+  528  rm *
+  529  cd ..
+  530  ls
+  531  rm -r take1/
+  532  ls
+  533  cd ..
+  534  ls
+  535  vi .gitignore
+  536  git status
+  537  cd multiple_instances/
+  538  git status
+  539  ls
+  540  git add *.result
+  541  cd ..
+  542  ls
+  543  git status
+  544  git commit -m "backup result from multiple experiments"
+  545  git push origin master
+  546  git add *
+  547  git status
+  548  git reset
+  549  git status
+  550  git add code/sanityCheck/
+  551  git status
+  552  git rm code/checkIDs.py
+  553  git status
+  554  git reset
+  555  git status
+  556  git diff code/find_closest_papers.py
+  557  git diff code/find_terms.py 
+  558  git add code/find_terms.py code/find_closest_papers.py
+  559  git commit
+  560  git status
+  561  git add *
+  562  git status
+  563  git rm code/*
+  564  git status
+  565  git rm code/checkIDs.py code/check_empty_lines.py check_failed_efetch.py
+  566  git status
+  567  git rm code/checkIDs.py
+  568  git rm code/check_empty_lines.py
+  569  git rm code/check_missing_ids.py
+  570  git rm code/*.py
+  571  git status
+  572  git reset
+  573  git status
+  574  git add *
+  575  git status
+  576  git reset
+  577  git reset
+  578  ls
+  579  git status
+  580  git push origin master
+  581  git status
+  582  subl .
+  583  git reset HEAD~1
+  584  git status
+  585  git reset --hard HEAD~1
+  586  git status
+  587  clear
+  588  git status
+  589  ls
+  590  cd code/
+  591  ls
+  592  rm check_missing_ids.py 
+  593  diff check_failed_efetch.py sanityCheck/check_failed_efetch.py 
+  594  rm check_failed_efetch.py 
+  595  rm check_empty_lines.py 
+  596  rm frobenius.py 
+  597  git status
+  598  git add *
+  599  git status
+  600  git rm checkIDs.py 
+  601  git status
+  602  git rm check_empty_lines.py check_failed_efetch.py check_missing_ids.py frobenius.py
+  603  git status
+  604  git add sanityCheck/
+  605  git rm concate.py 
+  606  git rm findRepeats.py 
+  607  git status
+  608  git commit -m "Moved files" 
+  609  git push origin master
+  610  git push --force
+  611  cd ..
+  612  ls
+  613  open
+  614  open .
+  615  git status
+  616  git add results/*
+  617  git status
+  618  ls
+  619  ls
+  620  git log
+  621  git checkout commit aabab8c8db7953a3b42c76526b93e84ab4d2634d
+  622  git status
+  623  git stash
+  624  git checkout aabab8c8db7953a3b42c76526b93e84ab4d2634d
+  625  ls
+  626  ls multiple_instances/
+  627  git log
+  628  git checkout d0ea21965b1819a6c2aa43b7c447e95f9fe294a0
+  629  ls multiple_instances/
+  630  git checkout 98f1153da72ba2941b51178d75f0826f781353d2
+  631  ls multiple_instances/
+  632  git log
+  633  git checkout 6854d90560583f940cb77e00da4a09deecf799d3
+  634  ls multiple_instances/
+  635  git checkout master
+  636  git log
+  637  ls
+  638  cd multiple_instances/
+  639  ls
+  640  history > commands.txt
