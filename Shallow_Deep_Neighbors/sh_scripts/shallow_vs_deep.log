@@ -1,0 +1,29 @@
+Concatenate with the target and first level neighbors
+2016 Feb 11 09:51
+Doing tf-idf calculation
+
+ Time took to build term freq hash:  92.3441860676
+2016 Feb 11 09:58
+Doing format conversion
+2016 Feb 11 09:59
+Doing SVD
+2016 Feb 11 09:59
+non-random set in deep-shallow experiment done
+Doing term extraction on the random set
+
+To load parsing tools:  0.0286309719086
+
+To load term file:  88.1673071384
+
+To find terms in all abstracts:  41574.358315
+2016 Feb 11 21:33
+Concatenate with the target and first level neighbors
+2016 Feb 11 21:33
+Doing tf-idf
+
+ Time took to build term freq hash:  23.3497819901
+2016 Feb 11 21:34
+Doing format  conversion
+2016 Feb 11 21:34
+Doing SVD
+2016 Feb 11 21:34
