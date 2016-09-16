@@ -1,0 +1,116 @@
+---
+title: "TFIDF comparison"
+author: "Santina Lin"
+date: "April 16, 2016"
+output: 
+  html_document:
+    keep_md: yes
+---
+
+There are many variant of TFIDFs (see [this wikipedia](https://en.wikipedia.org/wiki/Tf%E2%80%93idf)) Therefore I need to test a few of them. 
+
+I decided to vary only the tf part and use 10 small samples (a subset taken from the pubmed repeat samples) to check which variant works better. 
+
+## Note about the parameter
+
+This is using non-squart root of singular values to scale the matrix. 
+The distance metric is cosine 
+tfidf_binary : tf is either 1 or 0
+tfidf_logfreq : tf is log(frequency + 1) 
+tfidf_raw : tf is simply the frequency 
+tfidf_smoothlog: tf is 1 + log(frequency), this is the one I've been using and I'm interested to compare the other variants with this one. 
+
+## Load the data 
+
+```{r, message=FALSE}
+library(ggplot2)
+library(plyr)
+library(dplyr)
+library(stringr)
+```
+
+Load the data I recently generated (sample starts with 1, eg 1, 11, 12, 13...)
+```{r}
+tf_variants <- read.table("../data/recall_tfcomparison.result")
+str(tf_variants)
+# Preprocessing
+colnames(tf_variants) <- c("tf_variant", 'sample_num', 'nsv', 'recall')
+tf_variants$sample_num <- as.factor(str_replace(tf_variants$sample_num, 'random_pmids_', ''))
+str(tf_variants)
+``` 
+
+Load the data from before 
+
+```{r}
+tf_result <- read.table("../data/tf_idf_nonsqrtsv.hugin.result")
+str(tf_result)
+# Preproces
+colnames(tf_result) <- c("sample_num", 'distFunc', 'nsv', 'recall', 'runtime')
+tf_result$tf_variant <- factor('tfidf_smoothlog')
+tf_result <- tf_result[, names(tf_result) %in% c('tf_variant', 'sample_num', 'nsv', 'recall')]
+tf_result$sample_num <- tf_result$sample_num %>% as.factor()
+tf_result <- tf_result[, c(4, 1, 2, 3)] # rearrange columns 
+str(tf_result)
+```
+
+Now combine the two and graph!! 
+
+```{r}
+all_variants <- rbind(tf_variants, tf_result)
+
+create_curves <- function(data, graphTitle){
+  ggplot(data, aes(x=nsv, y=recall, colour=tf_variant)) + geom_point(alpha=0.1) + 
+  theme_bw() + ggtitle(graphTitle) + scale_x_continuous(expand = c(0, 0), breaks=seq(0, 1500, by=100)) + 
+  labs(x="# singular values",y="Average precision") +
+  theme(plot.title = element_text(color="#666666", face="bold", size=14, hjust=0.5, vjust=1))+ 
+  stat_summary(fun.y = mean, geom="line", size=1.5)
+}
+create_curves(all_variants, "TF variants Comparison in TF-IDF")
+```
+
+Okay I guess it's good I went with the normal one
+
+
+## Double check
+Instead of using old data for the 1 + log(freq) type tf, where I had 92 samples, I'm just gonna use the same 9 samples I have for the other 3 variants. 
+```{r}
+results2 <- read.table("../data/recall_tfvariants.result2")
+colnames(results2) <- c("tf_variant", 'sample_num', 'nsv', 'recall')
+create_curves(results2, "TF variants Comparison in TF-IDF")
+```
+
+The curve looks a lot closer because smoothlog curve is lower than in the previous figure. Just double check if the result are the same. 
+
+```{r}
+head(tf_result)
+head(results2[results2$tf_variant=="smoothlog", ])
+```
+
+looking at the sample 10, nsv=50, the recall doens't match.... So either because the first dataset is created from nsv=1500 for smoothlog, and the second result from nsv=1000, or that I changed the code that generated the recall value. 
+
+## Double check: control for nsv
+So I redo the SVD on the 9 samples with nsv=1500 for smoothlog. 
+```{r}
+smoothlog_1500 <- read.table("../data/recall_4tfvariants_9samples_smoothlog1500.result")
+colnames(smoothlog_1500) <- c("tf_variant", 'sample_num', 'nsv', 'recall')
+```
+
+And now let's inspect this again
+```{r}
+head(tf_result[c(tf_result$nsv==50), ], 1)  # nsv=1500, old data 
+head(results2[results2$tf_variant=="smoothlog", ], 1) # 1000
+head(smoothlog_1500[smoothlog_1500$tf_variant=="tfidf_smoothlog", ], 1) # nsv=1500 
+```
+
+## Found the bug, added a line for normalizing matrix 
+
+It looks like the code I use to calculate recall in bulk has a line for normalizing the matrix before taking the dot product, but in my find_closest.py I didn't have that line. So I fixed that and just check if the corrected new data matched the old data: 
+
+```{r}
+new_data <- read.table("../data/recall_fixednormalization.result")
+colnames(new_data) <- c("tf_variant", 'sample_num', 'nsv', 'recall')
+new_data$sample_num <- as.factor(str_replace(new_data$sample_num, 'random_pmids_', ''))
+str(new_data)
+new_data %>% subset(nsv==50) %>% subset(sample_num=="10")
+
+```
