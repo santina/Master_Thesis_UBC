@@ -1,0 +1,215 @@
+munin.bcgsc.ca [Tue Jan 26 22:33:02 PST 2016]
+nohup starting: ./track_release -nV:12440 -eigen-values:/projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.singular_values -vectors:/projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.U.1_of_1 -dim:4100 -track:101 -block-size:250 -prefix:./slin-closest/slin.closest-coords : ./track_release.Tue.Jan.26.22.33.02.PST.2016-munin.bcgsc.ca.nohup.out
+nohup[ return:0 process:74852 ]
+#MSG.. priority:-1
+#@ Tue Jan 26 22:33:02 2016
+ #MSG.. ./track_release
+[{"-prefix":"./slin-closest/slin.closest-coords","-block-size":"250","-nV":"12440","-track":"101","-vectors":"/projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.U.1_of_1","-eigen-values":"/projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.singular_values","-dim":"4100"},["./track_release"],{}]
+#MSG.. loading:/projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.U.1_of_1
+#MSG.. closed:/projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.U.1_of_1 12440 lines read
+#nVectors:12440
+#__IGNORED_COMMENT__:%%GraphLab SVD Solver library. This file contains the singular values.
+#MSG.. closed:/projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.singular_values 4101 lines read
+#Thread:0..tracking:./slin-closest/slin.closest-coords.0	@Tue Jan 26 22:33:48 2016
+
+#Thread:11..tracking:./slin-closest/slin.closest-coords.11	@Tue Jan 26 22:33:48 2016
+
+#__DISTRIBUTED_ACROSS_50_THREADS__	@Tue Jan 26 22:33:48 2016
+
+#Thread:1..tracking:./slin-closest/slin.closest-coords.1	@Tue Jan 26 22:33:48 2016
+
+#Thread:7..tracking:./slin-closest/slin.closest-coords.7	@Tue Jan 26 22:33:48 2016
+
+#Thread:4..tracking:./slin-closest/slin.closest-coords.4	@Tue Jan 26 22:33:48 2016
+
+#Thread:3..tracking:./slin-closest/slin.closest-coords.3	@Tue Jan 26 22:33:48 2016
+
+#Thread:6..tracking:./slin-closest/slin.closest-coords.6	@Tue Jan 26 22:33:48 2016
+
+#Thread:13..tracking:./slin-closest/slin.closest-coords.13	@Tue Jan 26 22:33:48 2016
+
+#Thread:8..tracking:./slin-closest/slin.closest-coords.8	@Tue Jan 26 22:33:48 2016
+
+#Thread:2..tracking:./slin-closest/slin.closest-coords.2	@Tue Jan 26 22:33:48 2016
+
+#Thread:30..tracking:./slin-closest/slin.closest-coords.30	@Tue Jan 26 22:33:48 2016
+
+#Thread:9..tracking:./slin-closest/slin.closest-coords.9	@Tue Jan 26 22:33:48 2016
+
+#Thread:12..tracking:./slin-closest/slin.closest-coords.12	@Tue Jan 26 22:33:48 2016
+
+#Thread:14..tracking:./slin-closest/slin.closest-coords.14	@Tue Jan 26 22:33:48 2016
+
+#Thread:19..tracking:./slin-closest/slin.closest-coords.19	@Tue Jan 26 22:33:48 2016
+
+#Thread:17..tracking:./slin-closest/slin.closest-coords.17	@Tue Jan 26 22:33:48 2016
+
+#Thread:34..tracking:./slin-closest/slin.closest-coords.34	@Tue Jan 26 22:33:48 2016
+
+#Thread:16..tracking:./slin-closest/slin.closest-coords.16	@Tue Jan 26 22:33:48 2016
+
+#Thread:27..tracking:./slin-closest/slin.closest-coords.27	@Tue Jan 26 22:33:48 2016
+
+#Thread:29..tracking:./slin-closest/slin.closest-coords.29	@Tue Jan 26 22:33:48 2016
+
+#Thread:36..tracking:./slin-closest/slin.closest-coords.36	@Tue Jan 26 22:33:48 2016
+
+#Thread:33..tracking:./slin-closest/slin.closest-coords.33	@Tue Jan 26 22:33:48 2016
+
+#Thread:21..tracking:./slin-closest/slin.closest-coords.21	@Tue Jan 26 22:33:48 2016
+
+#Thread:46..tracking:./slin-closest/slin.closest-coords.46	@Tue Jan 26 22:33:48 2016
+
+#Thread:39..tracking:./slin-closest/slin.closest-coords.39	@Tue Jan 26 22:33:48 2016
+
+#Thread:24..tracking:./slin-closest/slin.closest-coords.24	@Tue Jan 26 22:33:48 2016
+
+#Thread:26..tracking:./slin-closest/slin.closest-coords.26	@Tue Jan 26 22:33:48 2016
+
+#Thread:23..tracking:./slin-closest/slin.closest-coords.23	@Tue Jan 26 22:33:48 2016
+
+#Thread:35..tracking:./slin-closest/slin.closest-coords.35	@Tue Jan 26 22:33:48 2016
+
+#Thread:38..tracking:./slin-closest/slin.closest-coords.38	@Tue Jan 26 22:33:48 2016
+
+#Thread:10..tracking:./slin-closest/slin.closest-coords.10	@Tue Jan 26 22:33:48 2016
+
+#Thread:32..tracking:./slin-closest/slin.closest-coords.32	@Tue Jan 26 22:33:48 2016
+
+#Thread:41..tracking:./slin-closest/slin.closest-coords.41	@Tue Jan 26 22:33:48 2016
+
+#Thread:44..tracking:./slin-closest/slin.closest-coords.44	@Tue Jan 26 22:33:48 2016
+
+#Thread:40..tracking:./slin-closest/slin.closest-coords.40	@Tue Jan 26 22:33:48 2016
+
+#Thread:43..tracking:./slin-closest/slin.closest-coords.43	@Tue Jan 26 22:33:48 2016
+
+#Thread:5..tracking:./slin-closest/slin.closest-coords.5	@Tue Jan 26 22:33:48 2016
+
+#Thread:42..tracking:./slin-closest/slin.closest-coords.42	@Tue Jan 26 22:33:48 2016
+
+#Thread:31..tracking:./slin-closest/slin.closest-coords.31	@Tue Jan 26 22:33:48 2016
+
+#Thread:48..tracking:./slin-closest/slin.closest-coords.48	@Tue Jan 26 22:33:48 2016
+
+#Thread:28..tracking:./slin-closest/slin.closest-coords.28	@Tue Jan 26 22:33:48 2016
+
+#Thread:49..tracking:./slin-closest/slin.closest-coords.49	@Tue Jan 26 22:33:48 2016
+
+#Thread:15..tracking:./slin-closest/slin.closest-coords.15	@Tue Jan 26 22:33:48 2016
+
+#Thread:37..tracking:./slin-closest/slin.closest-coords.37	@Tue Jan 26 22:33:48 2016
+
+#Thread:47..tracking:./slin-closest/slin.closest-coords.47	@Tue Jan 26 22:33:48 2016
+
+#Thread:22..tracking:./slin-closest/slin.closest-coords.22	@Tue Jan 26 22:33:48 2016
+
+#Thread:18..tracking:./slin-closest/slin.closest-coords.18	@Tue Jan 26 22:33:48 2016
+
+#Thread:20..tracking:./slin-closest/slin.closest-coords.20	@Tue Jan 26 22:33:48 2016
+
+#Thread:25..tracking:./slin-closest/slin.closest-coords.25	@Tue Jan 26 22:33:48 2016
+
+#Thread:45..tracking:./slin-closest/slin.closest-coords.45	@Tue Jan 26 22:33:48 2016
+
+#Thread:12..tracking:./slin-closest/slin.closest-coords.12..OK:./slin-closest/slin.closest-coords.12	@Tue Jan 26 22:35:47 2016
+
+#Thread:22..tracking:./slin-closest/slin.closest-coords.22..OK:./slin-closest/slin.closest-coords.22	@Tue Jan 26 22:35:49 2016
+
+#Thread:6..tracking:./slin-closest/slin.closest-coords.6..OK:./slin-closest/slin.closest-coords.6	@Tue Jan 26 22:35:52 2016
+
+#Thread:34..tracking:./slin-closest/slin.closest-coords.34..OK:./slin-closest/slin.closest-coords.34	@Tue Jan 26 22:35:53 2016
+
+#Thread:27..tracking:./slin-closest/slin.closest-coords.27..OK:./slin-closest/slin.closest-coords.27	@Tue Jan 26 22:35:53 2016
+
+#Thread:11..tracking:./slin-closest/slin.closest-coords.11..OK:./slin-closest/slin.closest-coords.11	@Tue Jan 26 22:35:53 2016
+
+#Thread:47..tracking:./slin-closest/slin.closest-coords.47..OK:./slin-closest/slin.closest-coords.47	@Tue Jan 26 22:35:55 2016
+
+#Thread:26..tracking:./slin-closest/slin.closest-coords.26..OK:./slin-closest/slin.closest-coords.26	@Tue Jan 26 22:36:09 2016
+
+#Thread:49..tracking:./slin-closest/slin.closest-coords.49..OK:./slin-closest/slin.closest-coords.49	@Tue Jan 26 22:37:15 2016
+
+#Thread:32..tracking:./slin-closest/slin.closest-coords.32..OK:./slin-closest/slin.closest-coords.32	@Tue Jan 26 22:37:24 2016
+
+#Thread:43..tracking:./slin-closest/slin.closest-coords.43..OK:./slin-closest/slin.closest-coords.43	@Tue Jan 26 22:37:28 2016
+
+#Thread:7..tracking:./slin-closest/slin.closest-coords.7..OK:./slin-closest/slin.closest-coords.7	@Tue Jan 26 22:37:28 2016
+
+#Thread:2..tracking:./slin-closest/slin.closest-coords.2..OK:./slin-closest/slin.closest-coords.2	@Tue Jan 26 22:37:29 2016
+
+#Thread:46..tracking:./slin-closest/slin.closest-coords.46..OK:./slin-closest/slin.closest-coords.46	@Tue Jan 26 22:37:29 2016
+
+#Thread:37..tracking:./slin-closest/slin.closest-coords.37..OK:./slin-closest/slin.closest-coords.37	@Tue Jan 26 22:37:29 2016
+
+#Thread:19..tracking:./slin-closest/slin.closest-coords.19..OK:./slin-closest/slin.closest-coords.19	@Tue Jan 26 22:37:29 2016
+
+#Thread:18..tracking:./slin-closest/slin.closest-coords.18..OK:./slin-closest/slin.closest-coords.18	@Tue Jan 26 22:37:29 2016
+
+#Thread:9..tracking:./slin-closest/slin.closest-coords.9..OK:./slin-closest/slin.closest-coords.9	@Tue Jan 26 22:37:29 2016
+
+#Thread:0..tracking:./slin-closest/slin.closest-coords.0..OK:./slin-closest/slin.closest-coords.0	@Tue Jan 26 22:37:30 2016
+
+#Thread:1..tracking:./slin-closest/slin.closest-coords.1..OK:./slin-closest/slin.closest-coords.1	@Tue Jan 26 22:37:30 2016
+
+#Thread:3..tracking:./slin-closest/slin.closest-coords.3..OK:./slin-closest/slin.closest-coords.3	@Tue Jan 26 22:37:30 2016
+
+#Thread:40..tracking:./slin-closest/slin.closest-coords.40..OK:./slin-closest/slin.closest-coords.40	@Tue Jan 26 22:37:30 2016
+
+#Thread:5..tracking:./slin-closest/slin.closest-coords.5..OK:./slin-closest/slin.closest-coords.5	@Tue Jan 26 22:37:30 2016
+
+#Thread:16..tracking:./slin-closest/slin.closest-coords.16..OK:./slin-closest/slin.closest-coords.16	@Tue Jan 26 22:37:30 2016
+
+#Thread:8..tracking:./slin-closest/slin.closest-coords.8..OK:./slin-closest/slin.closest-coords.8	@Tue Jan 26 22:37:30 2016
+
+#Thread:31..tracking:./slin-closest/slin.closest-coords.31..OK:./slin-closest/slin.closest-coords.31	@Tue Jan 26 22:37:30 2016
+
+#Thread:45..tracking:./slin-closest/slin.closest-coords.45..OK:./slin-closest/slin.closest-coords.45	@Tue Jan 26 22:37:31 2016
+
+#Thread:14..tracking:./slin-closest/slin.closest-coords.14..OK:./slin-closest/slin.closest-coords.14	@Tue Jan 26 22:37:31 2016
+
+#Thread:4..tracking:./slin-closest/slin.closest-coords.4..OK:./slin-closest/slin.closest-coords.4	@Tue Jan 26 22:37:34 2016
+
+#Thread:33..tracking:./slin-closest/slin.closest-coords.33..OK:./slin-closest/slin.closest-coords.33	@Tue Jan 26 22:37:39 2016
+
+#Thread:30..tracking:./slin-closest/slin.closest-coords.30..OK:./slin-closest/slin.closest-coords.30	@Tue Jan 26 22:37:39 2016
+
+#Thread:48..tracking:./slin-closest/slin.closest-coords.48..OK:./slin-closest/slin.closest-coords.48	@Tue Jan 26 22:37:39 2016
+
+#Thread:42..tracking:./slin-closest/slin.closest-coords.42..OK:./slin-closest/slin.closest-coords.42	@Tue Jan 26 22:37:39 2016
+
+#Thread:24..tracking:./slin-closest/slin.closest-coords.24..OK:./slin-closest/slin.closest-coords.24	@Tue Jan 26 22:37:39 2016
+
+#Thread:25..tracking:./slin-closest/slin.closest-coords.25..OK:./slin-closest/slin.closest-coords.25	@Tue Jan 26 22:37:39 2016
+
+#Thread:36..tracking:./slin-closest/slin.closest-coords.36..OK:./slin-closest/slin.closest-coords.36	@Tue Jan 26 22:37:40 2016
+
+#Thread:10..tracking:./slin-closest/slin.closest-coords.10..OK:./slin-closest/slin.closest-coords.10	@Tue Jan 26 22:37:40 2016
+
+#Thread:28..tracking:./slin-closest/slin.closest-coords.28..OK:./slin-closest/slin.closest-coords.28	@Tue Jan 26 22:37:42 2016
+
+#Thread:29..tracking:./slin-closest/slin.closest-coords.29..OK:./slin-closest/slin.closest-coords.29	@Tue Jan 26 22:37:42 2016
+
+#Thread:20..tracking:./slin-closest/slin.closest-coords.20..OK:./slin-closest/slin.closest-coords.20	@Tue Jan 26 22:37:42 2016
+
+#Thread:39..tracking:./slin-closest/slin.closest-coords.39..OK:./slin-closest/slin.closest-coords.39	@Tue Jan 26 22:37:42 2016
+
+#Thread:21..tracking:./slin-closest/slin.closest-coords.21..OK:./slin-closest/slin.closest-coords.21	@Tue Jan 26 22:37:53 2016
+
+#Thread:15..tracking:./slin-closest/slin.closest-coords.15..OK:./slin-closest/slin.closest-coords.15	@Tue Jan 26 22:37:54 2016
+
+#Thread:23..tracking:./slin-closest/slin.closest-coords.23..OK:./slin-closest/slin.closest-coords.23	@Tue Jan 26 22:37:56 2016
+
+#Thread:44..tracking:./slin-closest/slin.closest-coords.44..OK:./slin-closest/slin.closest-coords.44	@Tue Jan 26 22:38:29 2016
+
+#Thread:41..tracking:./slin-closest/slin.closest-coords.41..OK:./slin-closest/slin.closest-coords.41	@Tue Jan 26 22:38:29 2016
+
+#Thread:13..tracking:./slin-closest/slin.closest-coords.13..OK:./slin-closest/slin.closest-coords.13	@Tue Jan 26 22:38:33 2016
+
+#Thread:17..tracking:./slin-closest/slin.closest-coords.17..OK:./slin-closest/slin.closest-coords.17	@Tue Jan 26 22:38:33 2016
+
+#Thread:35..tracking:./slin-closest/slin.closest-coords.35..OK:./slin-closest/slin.closest-coords.35	@Tue Jan 26 22:38:40 2016
+
+#Thread:38..tracking:./slin-closest/slin.closest-coords.38..OK:./slin-closest/slin.closest-coords.38	@Tue Jan 26 22:38:40 2016
+
+#OK
