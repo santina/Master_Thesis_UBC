@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/santina/Master_Thesis_UBC.png?label=ready&title=Ready)](https://waffle.io/santina/Master_Thesis_UBC)
 
 # Overview
 This repository contains the work I have done for my master thesis at University of British Columbia. It's a machine learning project on testing whether SVD could be used to find related articles by using only the keywords inside the abstracts of each article and finding what parameters work the best with SVD.
