@@ -1,29 +1,36 @@
 import sys
-sys.path.append('/home/slin/Thesis/Jake')  # Fix this path
+sys.path.append('/home/slin/Thesis/Jake')
 import textExtractionUtils as utils
 import timeit
 import pickle
 import argparse
+import nltk
+import nltk.data
 
-def getIDs(text, idList):
+def getIDs(text, idList, sentenceSplitter):
 	""" use textExtractionUtils to get the term IDs and # of term occurrences for each abstract
 	and return all the termIDs and term occurrences as a dictionary
 	"""
 	termID = {}
 
-	tokens = utils.tokenize(text)
+	# remove unicode that is not ascii for the sentence splitter.
+	text = text.replace("\\", "")
+	text = text.decode('unicode_escape').encode('ascii', 'ignore')
 
-	# Get the IDs of terms found in the sentence
-	ids_list = utils.getID_FromLongestTerm(tokens, idList)  # use a dictionary instead
+	for sentence in sentenceSplitter.tokenize(text):
+		tokens = utils.tokenize(sentence)
 
-	for ids in ids_list:
-		for i in ids:
-			termID[i] = termID.get(i, 0) + 1
+		# Get the IDs of terms found in the sentence
+		ids_list = utils.getID_FromLongestTerm(tokens, idList)  # use a dictionary instead
+
+		for ids in ids_list:
+			for i in ids:
+				termID[i] = termID.get(i, 0) + 1
 
 	return termID
 
 
-def getTermFreq(abstracts_file, idList):
+def getTermFreq(abstracts_file, idList, sentenceSplitter):
 	""" Read in a file listing all the abstracts and pass each abstract to `getIDs()`
 	to obtain the termID-frequency pairs as a dictionary
 	"""
@@ -31,7 +38,7 @@ def getTermFreq(abstracts_file, idList):
 		for line in f:
 			l = line.split('\t')
 			text = ' '.join([l[2], l[3]])  # Combine title l[2] and abstract l[3]
-			yield getIDs(text, idList)
+			yield getIDs(text, idList, sentenceSplitter)
 
 
 def hashAsString(dictionary):
@@ -57,7 +64,10 @@ def recordTermFreq(abstracts_file, idList, out_file):
 	"""
 	out = open(out_file, 'w')
 
-	for IDs in getTermFreq(abstracts_file, idList):
+	# Load the sentence splitter.
+	sentenceSplitter = nltk.data.load('tokenizers/punkt/english.pickle')
+
+	for IDs in getTermFreq(abstracts_file, idList, sentenceSplitter):
 		out.write(hashAsString(IDs) + '\n')
 
 
