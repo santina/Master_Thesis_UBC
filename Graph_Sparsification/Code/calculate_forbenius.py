@@ -22,24 +22,27 @@ def main():
     errorIndices = {} # matrix file to lowest error index
 
     # Calculate forbenius norm and errors for each matrix
+    print("Calculating forbenius norms for all the matrices.")
     makeForbeniusHash(args.matrixFolder, forbeniusNorms)
 
     # Calculate the variance in each matrix and the maximum acceptable nsv.
+    print("Calculating variances in the SVD results.")
     calculateVariances(args.svdFolder, args.min, args.max, args.step, variances, errorIndices)
 
     # Record the results
+    print("Writing results to the out file.")
     writeResults(args.out, forbeniusNorms, errorIndices, variances)
 
 def parse_args():
     """ Parsing input arguments """
     parser = argparse.ArgumentParser(description="Calculate forbenius norms on a folder of Graphlab result folders")
-	parser.add_argument('--matrixFolder', type=str, help="folder with the matrices")
+    parser.add_argument('--matrixFolder', type=str, help="folder with the matrices")
     parser.add_argument('--svdFolder', type=str, help="folder with the SVD result folders")
     parser.add_argument('--out', type=str, help="Out file to write the results to")
     parser.add_argument('--max', type=int, help="The maximum number of singular values")
     parser.add_argument('--min', type=int, help="The minimum number of singular values")
     parser.add_argument('--step', type=int, help="Step size of the number of singular values")
-	args = parser.parse_args()
+    args = parser.parse_args()
 
     if args.max <= args.min:
         print("Input error: max should be greater than min")
@@ -52,39 +55,45 @@ def makeForbeniusHash(folder, forbeniusNorms):
 
     for matrixFile in [f for f in listdir(folder) if isfile(join(folder, f))]:
         filePath = join(folder, matrixFile)
-        matrixName = matrixFile.replace(".matrix", "").replace(".sampled.", "_")
-        forbeniusNorms[matrixName] = forbenius(filePath)
+        #matrixName = matrixFile.replace(".matrix", "").replace(".sampled.", "_")
+        if "tf_idf" in matrixFile:
+            matrixFile = matrixFile.replace("tf_idf.matrix", "tfidf") # For the second experiment
+        else:
+             matrixFile = matrixFile.replace("neighbors.all.tf.matrix", "tf")  # For the second experiment
 
-def frobenius(matrixfile):
+        forbeniusNorms[matrixFile] = forbenius(filePath)
+
+def forbenius(matrixfile):
     """ Given the same matrix file to GraphLab, return the forbenius norm.
     """
-	frobenius = 0
-	with open(matrixfile) as f:
-		for _, line in enumerate(f): # 0 base for lineNum
-			_, _, val = line.strip().split('\t')
-			frobenius += float(val)**2
-	return frobenius
+    frobenius = 0
+    with open(matrixfile) as f:
+    	for _, line in enumerate(f): # 0 base for lineNum
+    		_, _, val = line.strip().split('\t')
+    		frobenius += float(val)**2
+    return frobenius
 
 def calculateVariances(folder, min_nsv, max_nsv, step_nsv, variances, errorIndices):
     """ Calculate the variances at various different singular values """
 
     # To into each svd folder
-    for svdFolder in [f for f in listdir(folder) if isDir(join(folder, f))]:
+    for svdFolder in [f for f in listdir(folder) if isdir(join(folder, f))]:
         currFolder = join(folder, svdFolder)
         logfile = ""
         matrixName = svdFolder
-        matrixName = matrixName.replace(".matrix.svd", "").replace(".sampled.", "_")
-
+        #matrixName = matrixName.replace(".matrix.svd", "").replace(".sampled.", "_")
+        matrixName = matrixName.replace("terfreq", "tf").replace(".matrix.svd", "").replace("tf_idf", "tfidf")
         # Obtain the log file for that folder of SVD outputs
-        for f in [f for f in listdir(currFolder) if isFile(join(currFolder, f))]:
+        for f in [f for f in listdir(currFolder) if isfile(join(currFolder, f))]:
             if ".log" in f:
                 logfile = join(currFolder, f)
 
         # Get the list of singular values and errors
         singularVals, errors = getSingularValues(logfile, 1000)  # TODO: make 1000 an input
 
-        # Find the maximum acceptable nsv
-        errorIndices[matrixName] = findIndexWLowerError(errors)
+        # Find the maximum acceptable nsv, skipping the first because the first singular
+        # have higher error rate.
+        errorIndices[matrixName] = findIndexWLowerError(errors, 1)
 
         # Calculate the variances for each nsv
         for nsv in range(min_nsv, max_nsv+1, step_nsv):
@@ -93,31 +102,31 @@ def calculateVariances(folder, min_nsv, max_nsv, step_nsv, variances, errorIndic
 
 def getSingularVariance(s, nranks=None):
     """ Get variance of the first 'nranks' of the singular value array """
-	variance = 0
+    variance = 0
 
-	if not nranks:
-		nranks = len(s)
-	for i in range(0, nranks):
-		variance += s[i]**2
+    if not nranks:
+    	nranks = len(s)
+    for i in range(0, nranks):
+    	variance += s[i]**2
 
-	return variance
+    return variance
 
 def getSingularValues(logfile_path, nvalues):
     """ Read in the log file to get an array singluar value and an array of errors
     """
-	singularVals = []
-	errors = []
-	count = 0
+    singularVals = []
+    errors = []
+    count = 0
 
-	with open(logfile_path) as f:
-		for _, line in enumerate(f): # 0 base for lineNum
-			if "Singular value" in line:
-				content = line.split()
-				singularVals.append(float(content[3]))
-				errors.append(float(content[6]))
-				count += 1
-				if count == nvalues:
-					break
+    with open(logfile_path) as f:
+    	for _, line in enumerate(f): # 0 base for lineNum
+    		if "Singular value" in line:
+    			content = line.split()
+    			singularVals.append(float(content[3]))
+    			errors.append(float(content[6]))
+    			count += 1
+    			if count == nvalues:
+    				break
 
 	assert len(errors) == len(singularVals)
 	return singularVals, errors
@@ -127,9 +136,13 @@ def findIndexWLowerError(array, start=0):
 		if 'e' not in str(array[i]):
 			return i
 
-def writeResults(outfile, forbeniusNorms, errorIndices, variance):
+def writeResults(outfile, forbeniusNorms, errorIndices, variances):
 
     out = open(outfile, "w")
+
+    # Write header
+    header = "\t".join(["matrix_name", "forbenius", "maxAcceptableNSV", "variance", "nsv"])
+    out.write(header + '\n')
 
     # loop through each matrix
     for matrixName in forbeniusNorms.keys():
@@ -137,7 +150,7 @@ def writeResults(outfile, forbeniusNorms, errorIndices, variance):
         maxNSV = errorIndices[matrixName]
         for pair in variances[matrixName]:
             nsv, variance = pair[0], pair[1]
-            result = '\t'.join([matrixName, forbenius, maxNSV, variance, nsv])
+            result = '\t'.join([matrixName, str(forbenius), str(maxNSV), str(variance), str(nsv)])
             out.write(result + '\n')
 
     out.close()
