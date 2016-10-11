@@ -14,6 +14,6 @@ do
 
 	tfidfOut=${2}/$PREFIX.tfidf
 
-	python ../Python_Code/tf_idf.py --t $FILE --tfidf $tfidfOut
+	python /projects/slin_prj/slin_prj_results/Master_Thesis_UBC/Shared/Python_Code/tf_idf.py --t $FILE --tfidf $tfidfOut
 
 done
