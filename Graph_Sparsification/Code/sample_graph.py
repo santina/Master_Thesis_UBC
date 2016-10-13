@@ -6,7 +6,7 @@ import random
 
 def main():
     # Parse the arguments
-    parseArgs()
+    args = parseArgs()
     # Sample the term frequencies in the file
     sampleAllOccurrences(args.f, args.out, args.rate)
 
@@ -14,7 +14,7 @@ def parseArgs():
     """ Parse the argument and do sanity check """
     parser = argparse.ArgumentParser(description='Sample a portion of the term-frequency matrix to simulate graph sparsification.')
     parser.add_argument('--f', type=str, help='term-frequency file')
-    parser.add_argument('--out', type=str, help='Subsample of the term-frequency file')
+    parser.add_argument('--out', type=str, help='Output folder')
     parser.add_argument('--rate', type=float, help="Sampling rate")
     args = parser.parse_args()
 
@@ -31,8 +31,10 @@ def sample(freq, rate):
         sampled_freq += 1 if random.random() > (1-rate) else 0
     return sampled_freq
 
-def sampleAllOccurrences(termFreqFile, outfile, rate):
+def sampleAllOccurrences(termFreqFile, outfolder, rate):
     """ Sample the term frequency in the `termFreqFile` """
+    outfile = "{0}/{1}_{2}".format(outfolder, termFreqFile.split("/")[-1], rate)
+
     with open(termFreqFile) as f, open(outfile, 'w') as out:
         for line in f:
             modifiedLine = ""
