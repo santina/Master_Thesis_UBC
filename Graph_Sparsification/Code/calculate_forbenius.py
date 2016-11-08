@@ -55,11 +55,8 @@ def makeForbeniusHash(folder, forbeniusNorms):
 
     for matrixFile in [f for f in listdir(folder) if isfile(join(folder, f))]:
         filePath = join(folder, matrixFile)
-        #matrixName = matrixFile.replace(".matrix", "").replace(".sampled.", "_")
-        if "tf_idf" in matrixFile:
-            matrixFile = matrixFile.replace("tf_idf.matrix", "tfidf") # For the second experiment
-        else:
-             matrixFile = matrixFile.replace("neighbors.all.tf.matrix", "tf")  # For the second experiment
+
+        matrixFile = matrixFile.replace(".matrix", "")
 
         forbeniusNorms[matrixFile] = forbenius(filePath)
 
@@ -82,7 +79,7 @@ def calculateVariances(folder, min_nsv, max_nsv, step_nsv, variances, errorIndic
         logfile = ""
         matrixName = svdFolder
         #matrixName = matrixName.replace(".matrix.svd", "").replace(".sampled.", "_")
-        matrixName = matrixName.replace("terfreq", "tf").replace(".matrix.svd", "").replace("tf_idf", "tfidf")
+        matrixName = matrixName.replace(".matrix.svd", "")
         # Obtain the log file for that folder of SVD outputs
         for f in [f for f in listdir(currFolder) if isfile(join(currFolder, f))]:
             if ".log" in f:
@@ -97,6 +94,7 @@ def calculateVariances(folder, min_nsv, max_nsv, step_nsv, variances, errorIndic
 
         # Calculate the variances for each nsv
         for nsv in range(min_nsv, max_nsv+1, step_nsv):
+
             variance = getSingularVariance(singularVals, nsv)
             variances[matrixName].append( (nsv, variance) )
 

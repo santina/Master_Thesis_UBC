@@ -17,8 +17,8 @@ OUT=${4}/out.${2}
 echo "doing: ${1}"
 echo "output: $OUT"
 echo "$HOSTNAME [$(date)]"
-#GRAPHLAB=/projects/edcc_prj2/sita/bin/GraphLab_22Apr2014/graphlab/release/toolkits/collaborative_filtering #munin and hugin
-GRAPHLAB=/projects/slin_prj/GraphLab_new/PowerGraph/release/toolkits/collaborative_filtering  #gphost03
+GRAPHLAB=/projects/edcc_prj2/sita/bin/GraphLab_22Apr2014/graphlab/release/toolkits/collaborative_filtering #munin and hugin
+#GRAPHLAB=/projects/slin_prj/GraphLab_new/PowerGraph/release/toolkits/collaborative_filtering  #gphost03
 echo "$GRAPHLAB/svd ${1} --ncpus=$NCPUS --rows=${3} --cols=$COLS --nsv=${2} --nv=$NV --max_iter=5 --quiet=1 --save_vectors=1 --predictions=$OUT"
 GRAPHLAB_CMD="$GRAPHLAB/svd ${1} --ncpus=$NCPUS --rows=${3} --cols=$COLS --nsv=${2} --nv=$NV --max_iter=$MAXITER --quiet=1 --save_vectors=1 --predictions=$OUT"
 echo "working dir: $(pwd)"
