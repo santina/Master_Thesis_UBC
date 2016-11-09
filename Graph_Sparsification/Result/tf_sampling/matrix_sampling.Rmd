@@ -1,0 +1,99 @@
+---
+title: "Matrix sampling"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview 
+Looking at how sampling rate affect the variances of the matrix. 
+
+The idea is that, the same number of singular values produce the same variance in a sampled matrix as the one in the non-sampled matrix. 
+
+There are 10 matrices, each sampled at different rate [0.1 - 0.9] with three replicates [1-3]. So that's a total of 270 sampled matrices. 
+
+## Import data 
+Setting up the required packages and import the data 
+```{r libraries, message=FALSE}
+
+library(ggplot2)
+library(plyr) # note to self: load this before dplyr always. 
+library(dplyr)
+library(magrittr)
+```
+
+``` {r data}
+tf <- read.table("termfreq.summary", header=TRUE)
+tf_original <- read.table("tf_original.summary", header = TRUE) 
+tfidf <- read.table("tfidf.summary", header=TRUE)
+tfidf_original <- read.table("tfidf_original.summary", header=TRUE)
+```
+
+## Clean up the data a bit
+
+Just setting some column names.
+```{r, message=FALSE}
+# Let's separate out the replication and rate  in different columns 
+tf <- tf %>% tidyr::separate(matrix_name, c("id", "type", "rate", "replicate"), sep = "_") %>% readr::type_convert()
+# Fix column name of tfidf and do the same thing 
+tfidf$matrix_name <- gsub(".tfidf", "", tfidf$matrix_name)
+tfidf$matrix_name <- gsub("tf", "tfidf", tfidf$matrix_name)
+tfidf <- tfidf %>% tidyr::separate(matrix_name, c("id", "type", "rate", "replicate"), sep = "_") %>% readr::type_convert()
+```
+
+Combine the data.frames 
+```{r}
+# Add the original matrix into the tf data.frame 
+tf_original$replicate = "1"
+tf_original$rate = 1
+tf_original <- tf_original %>% tidyr::separate(matrix_name, c("id", "type"), sep = "[.]")
+tf <- rbind(tf, tf_original)
+
+# Add the original to the tfidf data.frame 
+tfidf_original$replicate = "1"
+tfidf_original$rate = 1
+tfidf_original <- tfidf_original %>% tidyr::separate(matrix_name, c("id", "type"), sep = "[.]")
+tfidf <- rbind(tfidf, tfidf_original)
+
+```
+Fix up the types of the columns 
+```{r}
+# combine the two
+all <- rbind(tf, tfidf)
+
+# Turn nsv into factor 
+all$nsv <- as.factor(all$nsv)
+all$id <- as.factor(all$id)
+all$type <- as.factor(all$type)
+```
+
+What the data look like
+```{r}
+head(all)
+str(all)
+```
+
+## Analyzing data
+
+For each grouping of id-rate-nsv, calculate the mean variance and the standard devi
+
+```{r}
+tfidf_summary <- all[all$type=="tfidf", ] %>% dplyr::group_by(id, rate, nsv) %>% dplyr::summarise_at(c("variance", "forbenius"), c("mean", "sd")) %>% dplyr::mutate(cov = variance_mean / forbenius_mean)
+tf_summary <- all[all$type=="tf", ] %>% dplyr::group_by(id, rate, nsv) %>% dplyr::summarise_at(c("variance", "forbenius"), c("mean", "sd")) %>% dplyr::mutate(cov = variance_mean / forbenius_mean)
+```
+
+```{r}
+head(tf_summary)
+```
+
+## Graph data
+
+```{r}
+# Plot the one for tf 
+ggplot(tf_summary, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() + facet_wrap(~id)
+
+# Plot tfidf 
+ggplot(tfidf_summary, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() + facet_wrap(~id)
+```

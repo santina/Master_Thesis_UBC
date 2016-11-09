@@ -14,7 +14,7 @@ This folder contains all the writing and presentation related materials.
 
 ## Writing
 
-Contains committee meeting report and other writings. The [ongoing thesis paper](https://docs.google.com/document/d/1xFyoWQnfVvVx-QJalp7buL8DAc_gHKBtcnz1lEOTSHo/edit?usp=sharing) might be converted into LaTeX format later. 
+Contains committee meeting report and other writings. The [ongoing thesis paper](https://docs.google.com/document/d/1KWmSZgfZ5ttm6rXJn1gjGl-uA8-IsD8f83rbpXY1x3o/edit?usp=sharing) might be converted into LaTeX format later. 
 
 ## References
 
