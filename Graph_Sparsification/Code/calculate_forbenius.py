@@ -51,7 +51,7 @@ def parse_args():
     return args
 
 def makeForbeniusHash(folder, forbeniusNorms):
-    """ Calculat forbenius norm for all matrix files inside `folder` """
+    """ Calculate forbenius norm for all matrix files inside `folder` """
 
     for matrixFile in [f for f in listdir(folder) if isfile(join(folder, f))]:
         filePath = join(folder, matrixFile)
@@ -77,37 +77,42 @@ def calculateVariances(folder, min_nsv, max_nsv, step_nsv, variances, errorIndic
     for svdFolder in [f for f in listdir(folder) if isdir(join(folder, f))]:
         currFolder = join(folder, svdFolder)
         logfile = ""
-        matrixName = svdFolder
-        #matrixName = matrixName.replace(".matrix.svd", "").replace(".sampled.", "_")
-        matrixName = matrixName.replace(".matrix.svd", "")
+        matrixName = svdFolder.replace(".matrix.svd", "")
         # Obtain the log file for that folder of SVD outputs
         for f in [f for f in listdir(currFolder) if isfile(join(currFolder, f))]:
             if ".log" in f:
                 logfile = join(currFolder, f)
 
         # Get the list of singular values and errors
-        singularVals, errors = getSingularValues(logfile, 1000)  # TODO: make 1000 an input
+        singularVals, errors = getSingularValues(logfile, 800)  # TODO: make NSV an input
 
         # Find the maximum acceptable nsv, skipping the first because the first singular
         # have higher error rate.
         errorIndices[matrixName] = findIndexWLowerError(errors, 1)
 
+        print matrixName
         # Calculate the variances for each nsv
         for nsv in range(min_nsv, max_nsv+1, step_nsv):
-
-            variance = getSingularVariance(singularVals, nsv)
-            variances[matrixName].append( (nsv, variance) )
+            print nsv
+            actual_nsv, variance = getSingularVariance(singularVals, nsv)
+            variances[matrixName].append( (actual_nsv, variance) )
 
 def getSingularVariance(s, nranks=None):
     """ Get variance of the first 'nranks' of the singular value array """
     variance = 0
+    actual_nsv = 0
 
     if not nranks:
     	nranks = len(s)
     for i in range(0, nranks):
-    	variance += s[i]**2
+        try:
+            variance += s[i]**2
+            actual_nsv += 1
+        except IndexError:
+            break
 
-    return variance
+
+    return actual_nsv, variance
 
 def getSingularValues(logfile_path, nvalues):
     """ Read in the log file to get an array singluar value and an array of errors
