@@ -95,7 +95,7 @@ def calculateVariances(folder, min_nsv, max_nsv, step_nsv, variances, errorIndic
         for nsv in range(min_nsv, max_nsv+1, step_nsv):
             print nsv
             actual_nsv, variance = getSingularVariance(singularVals, nsv)
-            variances[matrixName].append( (actual_nsv, variance) )
+            variances[matrixName].append( (nsv, variance) )
 
 def getSingularVariance(s, nranks=None):
     """ Get variance of the first 'nranks' of the singular value array """
