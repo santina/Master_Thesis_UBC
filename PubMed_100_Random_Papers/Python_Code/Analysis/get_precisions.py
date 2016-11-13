@@ -126,22 +126,18 @@ def calculate_precision(matrix, targetRowIndex, true_indices, distfunc, rowNumTo
 	''' Measure the recall by seeing how many hits in predictions are in the actual answers
 	'''
 	localScore = 0
-
-	nNeighbors = len(true_indices)
-	rows_info = findClosestRows(matrix, targetRowIndex, nNeighbors, distfunc)  # a list of tuples (dist, index)
+	numPapersToRetrieve = 10
+	rows_info = findClosestRows(matrix, targetRowIndex, numPapersToRetrieve, distfunc)  # a list of tuples (dist, index)
 	predicted_rows = [pair[1] for pair in rows_info]  # extract out the indices in each tuple
 
 	print [rowNumToPmid[d] for d in predicted_rows]
-
-
-	assert len(predicted_rows) == len(true_indices)
 
 	# Measure the recall by seeing how many hits in predictions are in the actual answers
 	for row_index in predicted_rows:
 		if row_index in true_indices:
 			localScore += 1
 
-	return float(localScore)/nNeighbors  # return precision
+	return float(localScore)/numPapersToRetrieve  # return precision
 
 def get_precision(matrix, rowNumToPmid, pmidToRowNum, closestPapers, distfunc):
 	''' Get precision for this combination of parameters
@@ -183,20 +179,22 @@ def getAvgPrecision(matrixFile, logFile, answerFile, outfileObject):
 	# make a numpy matrix from the matrixfile
 	matrix = find.readMatrix(matrixFile, countLine(answerFile), 1500)
 	svals = getSVals(logFile, 1500)
-	matrix = find.scaleMatrix(matrix, svals)
+	matrix = find.scaleMatrix(matrix, svals)  # vary this with singular values or square root of singular values
 
 	# Experiment Name (a number):
 	experimentNum = re.findall(r'\d+', matrixFile.split('/')[-2])[0]
 
-	nMatrix = find.getMatrixSubset(matrix, 50)
-	# t_e, precision_e = get_precision(nMatrix, rowNumToPmid, pmidToRowNum, closestPapers, euclidean)
-	# writeResult((experimentNum, "Euclidean", nsv, precision_e, t_e), outfileObject)
+	for nsv in range(50, 1500, 50):
+		# Evaluate recall using Euclidean distances
+		nMatrix = find.getMatrixSubset(matrix, nsv)
+		t_e, precision_e = get_precision(nMatrix, rowNumToPmid, pmidToRowNum, closestPapers, euclidean)  # need to modify this function to do recall differently
+		writeResult((experimentNum, "Euclidean", nsv, precision_e, t_e), outfileObject)
 
-	nMatrix = find.normalizeMatrix(nMatrix)
-	t_c, precision_c = get_precision(nMatrix, rowNumToPmid, pmidToRowNum, closestPapers, cosine)
-	# writeResult((experimentNum, "Cosine", 50, precision_c, t_c), outfileObject)
+		# Evaluate recall using Cosine distances
+		nMatrix = find.normalizeMatrix(nMatrix)
+		t_c, precision_c = get_precision(nMatrix, rowNumToPmid, pmidToRowNum, closestPapers, cosine)
+		writeResult((experimentNum, "Cosine", nsv, precision_c, t_c), outfileObject)
 
-	print experimentNum, "Cosine"
 
 def getResult(matrixFolder, answersFolder, outfile):
 
@@ -222,6 +220,7 @@ def getResult(matrixFolder, answersFolder, outfile):
 		print curMatrix
 		print curLog
 		print curAnswer
+
 
 		getAvgPrecision(curMatrix, curLog, curAnswer, out)
 
