@@ -92,6 +92,13 @@ head(tf_summary)
 
 ## Result
 
+Excluding id 9 to make the facet-wrap 3 by 3. Don't worry, it's not an outlier. 
+```{r}
+tf_summary <- tf_summary[tf_summary$id != "9",]
+tfidf_summary <- tfidf_summary[tfidf_summary$id != "9",]
+```
+
+
 ```{r}
 # Plot the one for tf 
 ggplot(tf_summary, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() + facet_wrap(~id)

@@ -138,13 +138,21 @@ head(tf_summary)
 
 ## Result
 
+Excluding id 9 to make the facet-wrap 3 by 3. Don't worry, it's not an outlier. 
+
+```r
+tf_summary <- tf_summary[tf_summary$id != "9",]
+tfidf_summary <- tfidf_summary[tfidf_summary$id != "9",]
+```
+
+
 
 ```r
 # Plot the one for tf 
 ggplot(tf_summary, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() + facet_wrap(~id)
 ```
 
-![](matrix_sampling_files/figure-html/unnamed-chunk-7-1.png)\
+![](matrix_sampling_files/figure-html/unnamed-chunk-8-1.png)\
 From this plot we can see that lower sampling rate result in smaller coverage, which is measured by taking the ratio of the variance (of given number of singular values) and forbenius norm. The lines are relatively flat and this is consistent across different matrices. This means we could sample the matrix and the same number of singular values would still be representative enough compare to a matrix that's not sampled. 
 
 
@@ -153,7 +161,7 @@ From this plot we can see that lower sampling rate result in smaller coverage, w
 ggplot(tfidf_summary, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() + facet_wrap(~id)
 ```
 
-![](matrix_sampling_files/figure-html/unnamed-chunk-8-1.png)\
+![](matrix_sampling_files/figure-html/unnamed-chunk-9-1.png)\
 
 After some thoughts, I realize that sampling the matrix by taking a subset of the word occurences using a probability rate AND THEN convert the result into TFIDF doesn't really make sense. 
 
