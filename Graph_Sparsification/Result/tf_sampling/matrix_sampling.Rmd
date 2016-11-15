@@ -99,13 +99,13 @@ tfidf_summary <- tfidf_summary[tfidf_summary$id != "9",]
 ```
 
 
-```{r}
+```{r tf_coverage}
 # Plot the one for tf 
 ggplot(tf_summary, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() + facet_wrap(~id)
 ```
 From this plot we can see that lower sampling rate result in smaller coverage, which is measured by taking the ratio of the variance (of given number of singular values) and forbenius norm. The lines are relatively flat and this is consistent across different matrices. This means we could sample the matrix and the same number of singular values would still be representative enough compare to a matrix that's not sampled. 
 
-```{r}
+```{r tf_tfidf_coverage}
 # Plot tfidf 
 ggplot(tfidf_summary, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() + facet_wrap(~id)
 ```
@@ -120,3 +120,80 @@ Therefore, I'll try sampling AFTER converting to TFIDF next time.
 
 From the look of the graph though, the curves are quite flat and sampling seems to be able to give us a good idea of coverage. 
 
+
+## Running time
+
+We should sanity-check whether sampling reduces running time and that correlates to less entries in the matrix (next).
+
+Note that we do not include the run time and the sparsity information of non-sampled matrices because SVD for those matrices were run separately, possibly on different machines, so we cannot compare their SVD run time with the sampled matrices. 
+
+Load data
+```{r}
+run_time <- read.table("termfreq_runningtime.result", header=TRUE)
+run_time$matrix_name <- factor(run_time$matrix_name)
+```
+
+Summarize the data by taking the average
+
+```{r}
+get_summary <- function(data) {
+  summary <- data %>% dplyr::group_by(matrix_name, sample_rate) %>% dplyr::summarise_at(c("run_time"), c("mean", "sd")) %>% dplyr::mutate(de = sd/sqrt(3) )
+}
+run_time_summary <- get_summary(run_time)
+head(run_time_summary)
+```
+
+Graph result 
+
+```{r runningtime_tfidf_summary}
+ggplot(run_time_summary, aes(x = sample_rate, y = mean)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name)
+```
+
+Make 3 by 3 
+```{r runningtime_tfidf_3by3}
+ggplot(run_time_summary[run_time_summary$matrix_name!="98", ], aes(x = sample_rate, y = mean)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name)
+```
+
+Combine all matrices
+
+```{r runningtime_tfidf_all_matrices}
+ggplot(run_time_summary[run_time_summary$matrix_name!="98", ], aes(x = sample_rate, y = mean)) + geom_point() + stat_summary(fun.y = mean, geom="line", size=1.0)
+```
+
+
+## Sparsity 
+
+Load data
+```{r}
+sparsity <- read.table("sparsity_tf.result", header=TRUE)
+str(sparsity)
+sparsity$matrix_name <- factor(sparsity$matrix_name)
+```
+
+Summarize the data by taking the average
+
+```{r}
+get_summary <- function(data) {
+  summary <- data %>% dplyr::group_by(matrix_name, sample_rate) %>% dplyr::summarise_at(c("n_entries"), c("mean", "sd")) %>% dplyr::mutate(de = sd/sqrt(3) )
+}
+sparsity_summary <- get_summary(sparsity)
+head(sparsity_summary)
+```
+
+Graph result 
+
+```{r sparsity_tfidf_summary}
+ggplot(sparsity_summary, aes(x = sample_rate, y = mean)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name)
+```
+
+Make 3 by 3 
+```{r sparsity_tfidf_3by3}
+ggplot(sparsity_summary[sparsity_summary$matrix_name!="9", ], aes(x = sample_rate, y = mean)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name)
+```
+
+Sampling is fairly consistent at producing matrices with the same sparsity. 
+
+Combine different matrices together 
+```{r sparsity_tfidf_allmatrices}
+ggplot(sparsity_summary, aes(x = sample_rate, y = mean)) + geom_point() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) + stat_summary(fun.y = mean, geom="line", size=1.0)
+```
