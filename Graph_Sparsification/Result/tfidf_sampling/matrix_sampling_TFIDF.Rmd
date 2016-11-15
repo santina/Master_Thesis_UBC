@@ -61,7 +61,7 @@ all$scalar <- as.factor(all$scalar)
 
 ```{r}
 get_summary <- function(data) {
-  tfidf_summary <- data %>% dplyr::group_by(matrix_name, rate, nsv, scalar) %>% dplyr::summarise_at(c("variance", "forbenius"), c("mean", "sd")) %>% dplyr::mutate(cov = variance_mean / forbenius_mean)
+  summary <- data %>% dplyr::group_by(matrix_name, rate, nsv, scalar) %>% dplyr::summarise_at(c("variance", "forbenius"), c("mean", "sd")) %>% dplyr::mutate(cov = variance_mean / forbenius_mean)
 }
 
 tfidf_summary <- get_summary(all)
@@ -69,7 +69,7 @@ tfidf_summary <- get_summary(all)
 
 
 ## Result 
-```{r}
+```{r tfidf_coverage}
 # Plot tfidf 
 ggplot(tfidf_summary, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + facet_wrap(~matrix_name)
 ```
@@ -84,7 +84,7 @@ tfidf <- tfidf[tfidf$matrix_name != "9",]
 
 
 Scalar = 10
-```{r}
+```{r tfidf_coverage_scalar10}
 # Create different data.frame for different scalar group (including the sample = 1 group)
 all_10 <- rbind(tfidf_original, tfidf[tfidf$scalar==10,])
 all_10 <- get_summary(all_10)
@@ -92,17 +92,85 @@ ggplot(all_10, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point()
 ```
 
 Scalar = 100
-```{r}
+```{r tfidf_coverage_scalar100}
 all_100 <- rbind(tfidf_original, tfidf[tfidf$scalar==100,])
 all_100 <- get_summary(all_100)
 ggplot(all_100, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name)
 ```
 
 Scalar = 1000
-```{r}
+```{r tfidf_coverage_scalar1000}
 all_1000 <- rbind(tfidf_original, tfidf[tfidf$scalar==1000,])
 all_1000 <- get_summary(all_1000)
 ggplot(all_1000, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name)
+```
+
+## Running time 
+
+Load data
+```{r}
+run_time <- read.table("tfidf_runningtime.result", header=TRUE)
+str(run_time)
+run_time$scalar <- factor(run_time$scalar)
+run_time$matrix_name <- factor(run_time$matrix_name)
+```
+
+Summarize the data by taking the average
+
+```{r}
+get_summary <- function(data) {
+  summary <- data %>% dplyr::group_by(matrix_name, sample_rate, scalar) %>% dplyr::summarise_at(c("run_time"), c("mean", "sd")) %>% dplyr::mutate(de = sd/sqrt(3) )
+}
+
+run_time_summary <- get_summary(run_time)
+str(run_time_summary)
+head(run_time_summary)
+```
+
+Graph result 
+
+```{r runningtime_tfidf_summary}
+ggplot(run_time_summary, aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name)
+```
+
+Remove 90, 91, and 92 to show the data better. 
+```{r runningtime_tfidf_no_outliers}
+run_time_summary_subset <- subset(run_time_summary, !matrix_name %in% c("90", "91", "92"))
+ggplot(run_time_summary_subset, aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name)
+```
+
+
+## Sparsity 
+
+Load data
+```{r}
+sparsity <- read.table("sparsity_TFIDF.result", header=TRUE)
+str(sparsity)
+sparsity$scalar <- factor(run_time$scalar)
+sparsity$matrix_name <- factor(run_time$matrix_name)
+```
+
+Summarize the data by taking the average
+
+```{r}
+get_summary <- function(data) {
+  summary <- data %>% dplyr::group_by(matrix_name, sample_rate, scalar) %>% dplyr::summarise_at(c("n_entries"), c("mean", "sd")) %>% dplyr::mutate(de = sd/sqrt(3) )
+}
+
+sparsity_summary <- get_summary(sparsity)
+str(sparsity_summary)
+head(sparsity_summary)
+```
+
+Graph result 
+
+```{r sparsity_tfidf_summary}
+ggplot(sparsity_summary, aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name)
+```
+
+Make 3 by 3 
+```{r sparsity_tfidf_3by3}
+ggplot(sparsity_summary[sparsity_summary$matrix_name!="9", ], aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name)
 ```
 
 
