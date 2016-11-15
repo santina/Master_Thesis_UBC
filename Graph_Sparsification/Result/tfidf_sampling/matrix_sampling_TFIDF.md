@@ -308,8 +308,8 @@ str(sparsity)
 ```
 
 ```r
-sparsity$scalar <- factor(run_time$scalar)
-sparsity$matrix_name <- factor(run_time$matrix_name)
+sparsity$scalar <- factor(sparsity$scalar)
+sparsity$matrix_name <- factor(sparsity$matrix_name)
 ```
 
 Summarize the data by taking the average
