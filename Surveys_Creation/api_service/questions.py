@@ -24,6 +24,20 @@ SINGLE_CHOICE = {
     }
 }
 
+"""
+    @input : a list of strings representing the choice text
+    @output: a dictionary with correct schema for survey monkey
+"""
+def _format_text_choices(choice_list):
+    choice_schema = []
+    for choice in choice_list:
+        choice_schema.append(
+            {
+                "text": choice
+            }
+        )
+    return choice_schema
+
 
 '''
     @input:
@@ -35,12 +49,12 @@ SINGLE_CHOICE = {
 '''
 def make_single_choice_question(question_title, choices, position=None):
     question = SINGLE_CHOICE.copy()
-    question["heading"][0]["heading"] = question_title
-    question["answers"]["choices"] = choices
+    question["headings"][0]["heading"] = question_title
+
+    question["answers"]["choices"] = _format_text_choices(choices)
     if position:
         question["position"] = position
     return question
-
 
 '''
     @input:
@@ -51,7 +65,7 @@ def make_single_choice_question(question_title, choices, position=None):
 '''
 def make_paragraph(paragraph_text, position=None):
     question = PARAGRAPH.copy()
-    question["heading"][0]["heading"] = paragraph_text
+    question["headings"][0]["heading"] = paragraph_text
     if position:
         question["position"] = position
     return question
