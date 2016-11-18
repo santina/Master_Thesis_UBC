@@ -3,3 +3,8 @@
 *._.DS_Store
 *.pyc
 **/._*
+
+# other files
+**/.html
+**/private
+**/__pycache__
