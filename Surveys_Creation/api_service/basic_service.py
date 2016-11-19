@@ -128,3 +128,12 @@ class ApiService(object):
         question_data = questions.make_single_choice_question(title, choices)
         response = self.make_post_request(url, question_data)
         return response
+
+    def add_paragraph_with_random_placement(self, survey_id, page_id, text, positions, probs):
+        url = HOST + "/surveys/%s/pages/%s/questions" % (survey_id, page_id)
+        text_data = questions.make_paragraph(text)
+        text_data["headings"] = questions.add_random_placement(text_data, positions, probs)
+        print(text_data)
+        print
+        response = self.make_post_request(url, text_data)
+        return response

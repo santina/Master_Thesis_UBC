@@ -38,6 +38,37 @@ def _format_text_choices(choice_list):
         )
     return choice_schema
 
+'''
+    @input:
+        question: formatted question schema for survey monkey
+        position list: a list of integers specifying the position change
+        probabilities : a list of integer (must add up to 100) for chances of placement
+    @output:
+        a modified question schema
+'''
+def add_random_placement(question, position_list, probabilities):
+        # check inputs
+    if len(position_list) != len(probabilities):
+        print( "Cannot assign random placement due to bad inputs")
+        return
+    if sum(probabilities) != 100:
+        print("Cannot assign placement due to bad probability list")
+        return
+        
+    headings = []
+    question_title = question["headings"][0]["heading"]
+    for i in range(0, len(position_list)):
+        headings.append(
+            {
+                "random_assignment": {
+                    "position": position_list[i],
+                    "percent": probabilities[i]
+                },
+                "heading": question_title
+            }
+        )
+
+    return headings
 
 '''
     @input:
