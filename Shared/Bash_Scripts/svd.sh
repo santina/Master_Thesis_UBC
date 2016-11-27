@@ -7,7 +7,7 @@
 # {4} output folder
 
 # other parameters:
-NCPUS=16  # number of cpus you want to use. never more than num-of-cores - 2.
+NCPUS=30  # number of cpus you want to use. never more than num-of-cores - 2.
 COLS=969690 # number of columns (size of our wordlist )  #969690 for the newer wordlist 1062805 is a older one
 NV=$((${2}+200))	# 200 more than $NSV (extra buffer needed for convergence accuracy)
 MAXITER=5
