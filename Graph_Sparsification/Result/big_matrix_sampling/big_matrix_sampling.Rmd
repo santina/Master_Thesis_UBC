@@ -1,0 +1,58 @@
+---
+title: "Big Matrix Sampling "
+author: "Santina Lin"
+date: "November 26, 2016"
+output: 
+  html_document:
+    keep_md: yes
+---
+
+## Overview
+
+This is for examinig the data to prepare for SVD on the big 13-million-abstract matrix. To estimate the number of singular values needed, the following steps were done
+
+- convert the tf to tf-idf 
+- scale the tf-idf matrix by 100 
+- sample it with a 0.01 sampling rate 
+- run SVD on it, specifying nsv = 2000 
+
+```{r library, message=FALSE}
+library(ggplot2)
+library(plyr) # note to self: load this before dplyr always. 
+library(dplyr)
+```
+
+## Data 
+
+We'll look at the log file of the GraphLab output from running collaborative filtering on this matrix. 
+```{r}
+singular_value <- read.table("singular_val.summary", header=TRUE)
+head(singular_value)
+``` 
+
+### Error estimates 
+
+First let's plot the error 
+```{r error_estimates}
+ggplot(singular_value, aes(x = rank, y = error_estimate)) + geom_point(size=1) + ylab("Error estimate") + xlab("Rank")
+```
+It's clear that after some nsv, the error jumps up significantly, so we do not want to use those singular values. Let's find the number of singular values that have less than 0.5 error rate 
+
+```{r available_nsv}
+nsv <- sum(singular_value$error_estimate < 0.5)
+singular_value$error_estimate[nsv]
+singular_value$error_estimate[nsv+1]
+```
+
+### Singular values 
+
+Plotting the singular value
+```{r singular_value_plot}
+ggplot(singular_value, aes(x = rank, y = singular_value)) + geom_point(size=1) + ylab("Singular value") + xlab("Rank")
+```
+
+As expected in this sanity check, it's a downward curve that drops in tangential slope sharply after the first few singular value. 
+
+### Conclusion
+
+From the error estimation, we'll be using about `r nsv` nsv to run GraphLab on our original big matrix.  
