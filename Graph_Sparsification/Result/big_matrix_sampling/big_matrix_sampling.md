@@ -85,3 +85,48 @@ As expected in this sanity check, it's a downward curve that drops in tangential
 ### Conclusion
 
 From the error estimation, we'll be using about 973 nsv to run GraphLab on our original big matrix.  
+
+
+## On the full matrix 
+
+We used GraphLab to estimate 1100 singular values on the full tfidf matrix. 
+
+### Error estimate 
+
+First let's plot the error 
+
+```r
+singularval_fullmatrix <- read.table("singularval_fullmatrix.summary", header=TRUE)
+ggplot(singularval_fullmatrix, aes(x = rank, y = error_estimate)) + geom_point(size=1) + ylab("Error estimate") + xlab("Rank")
+```
+
+![](big_matrix_sampling_files/figure-html/error_estimates_fullmatrix-1.png)\
+It's clear that after some nsv, the error jumps up significantly, so we do not want to use those singular values. Let's find the number of singular values that have less than 0.5 error rate 
+
+
+```r
+nsv <- sum(singularval_fullmatrix$error_estimate < 0.5)
+singularval_fullmatrix$error_estimate[nsv]
+```
+
+```
+## [1] 0.305084
+```
+
+```r
+singularval_fullmatrix$error_estimate[nsv+1]
+```
+
+```
+## [1] 1.93905
+```
+
+### singular values 
+
+```r
+ggplot(singularval_fullmatrix, aes(x = rank, y = singular_value)) + geom_point(size=1) + ylab("Singular value") + xlab("Rank")
+```
+
+![](big_matrix_sampling_files/figure-html/singular_value_plot_fullmatrix-1.png)\
+
+The number of singular values measured to be useable are 529.
