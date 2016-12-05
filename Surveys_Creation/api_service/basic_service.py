@@ -46,6 +46,13 @@ class ApiService(object):
 
         return response.json()
 
+    def get_surveys(self):
+        """ Returns a list of surveys owned or shared with the authenticated user. """
+        url = HOST + "/surveys"
+
+        response = self.make_get_request(url)
+        return response
+
     def create_survey(self, survey_name):
         """ Create an empty survey given the name and return the survey ID """
         url = HOST + "/surveys"
@@ -94,6 +101,14 @@ class ApiService(object):
             page_ids.append(page["id"])
         return page_ids
 
+    def get_questions_ids(self, survey_id, page_id):
+        url = HOST + "/surveys/%s/pages/%s/questions" %(survey_id, page_id)
+        response =  self.make_get_request(url)
+        questions_ids = []
+        for question in response["data"]:
+            questions_ids.append(question["id"])
+        return questions_ids
+
     def create_new_page(self, survey_id, title, description):
         """ Create a new page with title and description of the page,
         and return the page id """
@@ -137,3 +152,13 @@ class ApiService(object):
         print
         response = self.make_post_request(url, text_data)
         return response
+
+    def replace_single_choice_question(self, survey_id, page_id, question_id, title, choices):
+        url = "https://api.surveymonkey.net/v3/surveys/%s/pages/%s/questions/%s" % (survey_id, page_id, question_id)
+        question_data = questions.make_single_choice_question(title, choices)
+        response = self.make_put_request(url, question_data)
+
+    def replace_paragraph_text(self, survey_id, page_id, question_id, text):
+        url = "https://api.surveymonkey.net/v3/surveys/%s/pages/%s/questions/%s" % (survey_id, page_id, question_id)
+        text_data = questions.make_paragraph(text)
+        response = self.make_put_request(url, text_data)
