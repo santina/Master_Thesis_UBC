@@ -18,10 +18,6 @@ library(plyr) # note to self: load this before dplyr always.
 library(dplyr)
 ```
 
-```
-## Warning: package 'dplyr' was built under R version 3.2.5
-```
-
 ## Data 
 
 We'll look at the log file of the GraphLab output from running collaborative filtering on this matrix. 
@@ -49,7 +45,7 @@ First let's plot the error
 ggplot(singular_value, aes(x = rank, y = error_estimate)) + geom_point(size=1) + ylab("Error estimate") + xlab("Rank")
 ```
 
-![](big_matrix_sampling_files/figure-html/error_estimates-1.png)\
+![](big_matrix_sampling_files/figure-html/error_estimates-1.png)<!-- -->
 It's clear that after some nsv, the error jumps up significantly, so we do not want to use those singular values. Let's find the number of singular values that have less than 0.5 error rate 
 
 
@@ -78,7 +74,7 @@ Plotting the singular value
 ggplot(singular_value, aes(x = rank, y = singular_value)) + geom_point(size=1) + ylab("Singular value") + xlab("Rank")
 ```
 
-![](big_matrix_sampling_files/figure-html/singular_value_plot-1.png)\
+![](big_matrix_sampling_files/figure-html/singular_value_plot-1.png)<!-- -->
 
 As expected in this sanity check, it's a downward curve that drops in tangential slope sharply after the first few singular value. 
 
@@ -100,7 +96,7 @@ singularval_fullmatrix <- read.table("singularval_fullmatrix.summary", header=TR
 ggplot(singularval_fullmatrix, aes(x = rank, y = error_estimate)) + geom_point(size=1) + ylab("Error estimate") + xlab("Rank")
 ```
 
-![](big_matrix_sampling_files/figure-html/error_estimates_fullmatrix-1.png)\
+![](big_matrix_sampling_files/figure-html/error_estimates_fullmatrix-1.png)<!-- -->
 It's clear that after some nsv, the error jumps up significantly, so we do not want to use those singular values. Let's find the number of singular values that have less than 0.5 error rate 
 
 
@@ -127,6 +123,50 @@ singularval_fullmatrix$error_estimate[nsv+1]
 ggplot(singularval_fullmatrix, aes(x = rank, y = singular_value)) + geom_point(size=1) + ylab("Singular value") + xlab("Rank")
 ```
 
-![](big_matrix_sampling_files/figure-html/singular_value_plot_fullmatrix-1.png)\
+![](big_matrix_sampling_files/figure-html/singular_value_plot_fullmatrix-1.png)<!-- -->
 
 The number of singular values measured to be useable are 529.
+
+# Compare
+
+## singular values 
+
+
+```r
+singular_value$matrix <- factor("sampled matrix")
+singularval_fullmatrix$matrix <- factor("full matrix")
+svals <- rbind(singularval_fullmatrix, singular_value)
+ggplot(svals, aes(x = rank, y = singular_value, colour=matrix)) + geom_point(size=1) + ylab("Singular value") + xlab("Rank")
+```
+
+![](big_matrix_sampling_files/figure-html/compare_svals-1.png)<!-- -->
+
+Due to some quirks in GraphLab, to accurate estimate the first 1000 nsv, we would need to give some room for convergence. Because of the high error estimates after 500 singular values in the full matrix, which was made by telling graphlab to estimate 1100 nsv, I'd need to redo the SVD on the full matrix by doing nsv=2000 if I want to estimate the first 1000 more accurately, just like what I did with the sampled matrix. 
+
+## coverage
+Here we will compare the coverage (variance/frobinous norm) of the sampled and the whole matrix for sanity check. 
+
+
+```r
+full_big_matrix_frobenius <- 2594103790.6 
+sampled_matrix_100X0.01 <- 3282812126.0
+
+sampled_100X_0.01_2000nsv_cov <- read.table("nsv_coverage_sampled_matrix_2000_100X0.01.result", header=TRUE)
+full_matrix_1000nsv_cov <- read.table("nsv_coverage_full_matrix_tfidf1100.result", header=TRUE)
+```
+
+
+```r
+sampled_100X_0.01_2000nsv_cov$matrix <- factor("sampled matrix")
+full_matrix_1000nsv_cov$matrix  <- factor("full matrix")
+coverage <- rbind(sampled_100X_0.01_2000nsv_cov, full_matrix_1000nsv_cov)
+
+ggplot(coverage, aes(x = nsv, y = coverage, colour=matrix)) + geom_point(size=1) + ylab("coverage") + xlab("# singular values")
+```
+
+![](big_matrix_sampling_files/figure-html/coverage_graph-1.png)<!-- -->
+
+BAD: the coverage is low.
+
+GOOD: the two matrices agree with each other in terms of coverage. 
+

@@ -83,3 +83,42 @@ ggplot(singularval_fullmatrix, aes(x = rank, y = singular_value)) + geom_point(s
 ```
 
 The number of singular values measured to be useable are `r nsv`.
+
+# Compare
+
+## singular values 
+
+```{r compare_svals}
+singular_value$matrix <- factor("sampled matrix")
+singularval_fullmatrix$matrix <- factor("full matrix")
+svals <- rbind(singularval_fullmatrix, singular_value)
+ggplot(svals, aes(x = rank, y = singular_value, colour=matrix)) + geom_point(size=1) + ylab("Singular value") + xlab("Rank")
+```
+
+Due to some quirks in GraphLab, to accurate estimate the first 1000 nsv, we would need to give some room for convergence. Because of the high error estimates after 500 singular values in the full matrix, which was made by telling graphlab to estimate 1100 nsv, I'd need to redo the SVD on the full matrix by doing nsv=2000 if I want to estimate the first 1000 more accurately, just like what I did with the sampled matrix. 
+
+## coverage
+Here we will compare the coverage (variance/frobinous norm) of the sampled and the whole matrix for sanity check. 
+
+```{r coverage_data}
+full_big_matrix_frobenius <- 2594103790.6 
+sampled_matrix_100X0.01 <- 3282812126.0
+
+sampled_100X_0.01_2000nsv_cov <- read.table("nsv_coverage_sampled_matrix_2000_100X0.01.result", header=TRUE)
+full_matrix_1000nsv_cov <- read.table("nsv_coverage_full_matrix_tfidf1100.result", header=TRUE)
+
+```
+
+```{r coverage_graph}
+sampled_100X_0.01_2000nsv_cov$matrix <- factor("sampled matrix")
+full_matrix_1000nsv_cov$matrix  <- factor("full matrix")
+coverage <- rbind(sampled_100X_0.01_2000nsv_cov, full_matrix_1000nsv_cov)
+
+ggplot(coverage, aes(x = nsv, y = coverage, colour=matrix)) + geom_point(size=1) + ylab("coverage") + xlab("# singular values")
+
+```
+
+BAD: the coverage is low.
+
+GOOD: the two matrices agree with each other in terms of coverage. 
+
