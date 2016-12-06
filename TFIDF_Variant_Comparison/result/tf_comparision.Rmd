@@ -59,7 +59,7 @@ Now combine the two and graph!!
 all_variants <- rbind(tf_variants, tf_result)
 
 create_curves <- function(data, graphTitle){
-  ggplot(data, aes(x=nsv, y=recall, colour=tf_variant)) + geom_point(alpha=0.1) + 
+  ggplot(data, aes(x=nsv, y=recall, colour=tf_variant)) + geom_point(alpha=0.2) + 
   theme_bw() + ggtitle(graphTitle) + scale_x_continuous(expand = c(0, 0), breaks=seq(0, 1500, by=100)) + 
   labs(x="# singular values",y="Average precision") +
   theme(plot.title = element_text(color="#666666", face="bold", size=14, hjust=0.5, vjust=1))+ 
@@ -112,5 +112,37 @@ colnames(new_data) <- c("tf_variant", 'sample_num', 'nsv', 'recall')
 new_data$sample_num <- as.factor(str_replace(new_data$sample_num, 'random_pmids_', ''))
 str(new_data)
 new_data %>% subset(nsv==50) %>% subset(sample_num=="10")
+```
 
+
+## Final result 
+
+Using the code with normalization, evaluating by looking at the top 10, and making sure every matrices were derived from nsv=1000 
+
+```{r final_data}
+dat <-  read.table("../data/recall_4tfvariants_top10.result")
+colnames(dat) <- c("tf_variant", 'sample_num', 'nsv', 'recall')
+
+dat$sample_num <- as.factor(str_replace(dat$sample_num, 'random_pmids_', ''))
+create_curves(dat, "Final")
+```
+
+What if it's top 20? 
+```{r final_data_top20}
+dat <-  read.table("../data/recall_4tfvariants_top20.result")
+colnames(dat) <- c("tf_variant", 'sample_num', 'nsv', 'recall')
+
+dat$sample_num <- as.factor(str_replace(dat$sample_num, 'random_pmids_', ''))
+create_curves(dat, "Final")
+```
+
+top 40 
+
+What if it's top 20? 
+```{r final_data_top40}
+dat <-  read.table("../data/recall_4tfvariants_top40.result")
+colnames(dat) <- c("tf_variant", 'sample_num', 'nsv', 'recall')
+
+dat$sample_num <- as.factor(str_replace(dat$sample_num, 'random_pmids_', ''))
+create_curves(dat, "Final")
 ```

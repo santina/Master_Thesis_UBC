@@ -97,7 +97,7 @@ Now combine the two and graph!!
 all_variants <- rbind(tf_variants, tf_result)
 
 create_curves <- function(data, graphTitle){
-  ggplot(data, aes(x=nsv, y=recall, colour=tf_variant)) + geom_point(alpha=0.1) + 
+  ggplot(data, aes(x=nsv, y=recall, colour=tf_variant)) + geom_point(alpha=0.2) + 
   theme_bw() + ggtitle(graphTitle) + scale_x_continuous(expand = c(0, 0), breaks=seq(0, 1500, by=100)) + 
   labs(x="# singular values",y="Average precision") +
   theme(plot.title = element_text(color="#666666", face="bold", size=14, hjust=0.5, vjust=1))+ 
@@ -106,7 +106,7 @@ create_curves <- function(data, graphTitle){
 create_curves(all_variants, "TF variants Comparison in TF-IDF")
 ```
 
-![](tf_comparision_files/figure-html/unnamed-chunk-4-1.png)\
+![](tf_comparision_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 
 Okay I guess it's good I went with the normal one
 
@@ -120,7 +120,7 @@ colnames(results2) <- c("tf_variant", 'sample_num', 'nsv', 'recall')
 create_curves(results2, "TF variants Comparison in TF-IDF")
 ```
 
-![](tf_comparision_files/figure-html/unnamed-chunk-5-1.png)\
+![](tf_comparision_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
 The curve looks a lot closer because smoothlog curve is lower than in the previous figure. Just double check if the result are the same. 
 
@@ -224,3 +224,45 @@ new_data %>% subset(nsv==50) %>% subset(sample_num=="10")
 ## 541      tfidf_smoothlog         10  50 0.4832512
 ## 721 tfidf_smoothlog_1000         10  50 0.4832512
 ```
+
+
+## Final result 
+
+Using the code with normalization, evaluating by looking at the top 10, and making sure every matrices were derived from nsv=1000 
+
+
+```r
+dat <-  read.table("../data/recall_4tfvariants_top10.result")
+colnames(dat) <- c("tf_variant", 'sample_num', 'nsv', 'recall')
+
+dat$sample_num <- as.factor(str_replace(dat$sample_num, 'random_pmids_', ''))
+create_curves(dat, "Final")
+```
+
+![](tf_comparision_files/figure-html/final_data-1.png)<!-- -->
+
+What if it's top 20? 
+
+```r
+dat <-  read.table("../data/recall_4tfvariants_top20.result")
+colnames(dat) <- c("tf_variant", 'sample_num', 'nsv', 'recall')
+
+dat$sample_num <- as.factor(str_replace(dat$sample_num, 'random_pmids_', ''))
+create_curves(dat, "Final")
+```
+
+![](tf_comparision_files/figure-html/final_data_top20-1.png)<!-- -->
+
+top 40 
+
+What if it's top 20? 
+
+```r
+dat <-  read.table("../data/recall_4tfvariants_top40.result")
+colnames(dat) <- c("tf_variant", 'sample_num', 'nsv', 'recall')
+
+dat$sample_num <- as.factor(str_replace(dat$sample_num, 'random_pmids_', ''))
+create_curves(dat, "Final")
+```
+
+![](tf_comparision_files/figure-html/final_data_top40-1.png)<!-- -->
