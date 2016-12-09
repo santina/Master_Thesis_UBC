@@ -16,11 +16,12 @@ The data are split by the type of matrices in order to decrease the time of proc
 
 # Data preparation and inspection
 
-```{r}
+```{r, message=FALSE}
 library(ggplot2)
 library(plyr)
 library(dplyr)
 library(knitr) # kable()
+library(tidyr)
 ```
 First load the data 
 ```{r}
@@ -32,16 +33,14 @@ prepare_data <- function(filepath){
   data 
 }
 
-term_frequency <- prepare_data("data/term_freq_precision.result") 
-term_binary <- prepare_data("data/term_binary_precision.result")
-tf_idf <- prepare_data("data/tfidf_precision.result")
+term_frequency <- prepare_data("data/term_freq_precision_top10.result") 
+term_binary <- prepare_data("data/term_binary_precision_top10.result")
+tf_idf <- prepare_data("data/tfidf_precision_top10.result")
 ```
 
 Slight inspection of the data 
 ```{r}
 str(tf_idf)
-str(term_binary)
-str(term_frequency)
 unique(tf_idf$nsv)  # see what are the numbers of singular values that I measured 
 ```
 
@@ -57,8 +56,7 @@ all_result <- rbind(tf_idf, term_binary, term_frequency)
 str(all_result) # inspect final dataframe
 ```
 
-
-# Average recalls curves 
+# Average precision curves 
 
 The lines are the means of precisions from 92 different experiments for a given singular values. We can see that the performance is fairly consistent across any randomly chosen 100 PMIDs. 
 
@@ -86,6 +84,34 @@ kable(maxima, format="markdown") # ensure Github can render the table
 ```
 
 As demosntrated in the code: I first take the mean of precisions across all samples, for each unique combination of sample number, nsv, distance function, and matrix type. So basically an average for 92 different points. Then I get the maxima prececisions across all number of singular values for each unique combination of distance function and matrixtype. That way we know, on average, at what nsv are the maxima precision is achieved. 
+
+# Frobenius norm 
+
+It's good to see how much the data is captured at different nsv. This would give an idea of how much information we actually need to make prediction. 
+We want to see how much coverage we are achieving. 
+```{r coverage}
+tfidf_coverage  <- read.table("data/tf_idf_frobenius.result", header=TRUE)
+term_freq_coverage <- read.table("data/term_freq_frobenius.result", header=TRUE)
+term_binary_coverage <- read.table("data/term_binary_frobenius.result", header=TRUE)
+tfidf_coverage$matrixType = factor("TF-IDF")
+term_freq_coverage$matrixType = factor("Frequency")
+term_binary_coverage$matrixType = factor("Binary")
+coverage <- rbind(tfidf_coverage, term_freq_coverage, term_binary_coverage)
+coverage <- dplyr::mutate(coverage, cov = variance/forbenius)
+
+# Graph
+create_curves <- function(data, graphTitle){
+  ggplot(data, aes(x=nsv, y=cov)) + geom_point(alpha=0.1) + 
+  facet_grid(matrixType ~ .) + theme_bw() + ggtitle(graphTitle) + scale_x_continuous(expand = c(0, 0), breaks=seq(0, 1500, by=100)) + 
+  labs(x="# singular values",y="Average precision") +
+  theme(plot.title = element_text(color="#666666", face="bold", size=16, hjust=0.2, vjust=1))+ 
+  stat_summary(fun.y = mean, geom="line", size=1.5)
+}
+create_curves(coverage, "Average coverage")
+
+```
+
+I don't know how to explain both the superior of TFIDF but its lower coverage than the other two metrics. Perhaps with TF-IDF the first ranks captured by SVD are more accurate. 
 
 # Distribution of max precision 
 
@@ -148,3 +174,4 @@ This is to see how long the calculation takes. So it looks like using cosine fun
 ggplot(all_result_means, aes(x=nsv, y=meanTime, colour=distFunc)) + geom_point() + facet_grid(matrixType ~ .) + 
   theme_bw() + labs(x="number of singular values", y="average time") 
 ```
+

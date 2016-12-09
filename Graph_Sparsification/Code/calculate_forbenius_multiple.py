@@ -84,7 +84,7 @@ def calculateVariances(folder, min_nsv, max_nsv, step_nsv, variances, errorIndic
                 logfile = join(currFolder, f)
 
         # Get the list of singular values and errors
-        singularVals, errors = getSingularValues(logfile, 800)  # TODO: make NSV an input
+        singularVals, errors = getSingularValues(logfile, 1500)  # TODO: make NSV an input
 
         # Find the maximum acceptable nsv, skipping the first because the first singular
         # have higher error rate.
@@ -92,9 +92,13 @@ def calculateVariances(folder, min_nsv, max_nsv, step_nsv, variances, errorIndic
 
         print matrixName
         # Calculate the variances for each nsv
+
         for nsv in range(min_nsv, max_nsv+1, step_nsv):
             print nsv
             actual_nsv, variance = getSingularVariance(singularVals, nsv)
+            if nsv > len(singularVals):
+                variances[matrixName].append( (len(singularVals), variance) )
+                break
             variances[matrixName].append( (nsv, variance) )
 
 def getSingularVariance(s, nranks=None):
