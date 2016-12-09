@@ -162,13 +162,13 @@ sVals  <-  ddply(sVals, c("matrix_type", "rank"), summarise, avg_sval = mean(sin
 ggplot(data=sVals, aes(x = rank, y=avg_sval, colour=matrix_type)) + geom_point(alpha=0.3) + labs(x="Rank",y="Average singular value")
 ```
 
-![](analysis_top10_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+![](analysis_top10_files/figure-html/singular_val_plots-1.png)<!-- -->
 
 ```r
-ggplot(data=sVals, aes(x = rank, y=avg_error, colour=matrix_type)) + geom_point(alpha=0.3) + labs(x="Rank",y="Average singular value")
+ggplot(data=sVals, aes(x = rank, y=avg_error, colour=matrix_type)) + geom_point(alpha=0.3) + labs(x="Rank",y="Average error estimates")
 ```
 
-![](analysis_top10_files/figure-html/unnamed-chunk-7-2.png)<!-- -->
+![](analysis_top10_files/figure-html/singular_val_plots-2.png)<!-- -->
 
 
 I don't know how to explain both the superior of TFIDF but its lower coverage than the other two metrics. Perhaps with TF-IDF the first ranks captured by SVD are more accurate. 
@@ -189,7 +189,7 @@ ggplot(max_mean, aes(x=distFunc, y=precision, fill=distFunc)) + geom_boxplot(sho
         strip.text.x = element_text(size=14))
 ```
 
-![](analysis_top10_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+![](analysis_top10_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
 
 
@@ -230,7 +230,7 @@ ggplot(maxima_nsv, aes(x=distFunc, y=nsv, fill=distFunc)) + geom_boxplot(show.le
         strip.text.x = element_text(size=14))
 ```
 
-![](analysis_top10_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
+![](analysis_top10_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
 
 
 ```r
@@ -260,5 +260,5 @@ ggplot(all_result_means, aes(x=nsv, y=meanTime, colour=distFunc)) + geom_point()
   theme_bw() + labs(x="number of singular values", y="average time") 
 ```
 
-![](analysis_top10_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
+![](analysis_top10_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
 
