@@ -111,6 +111,15 @@ create_curves(coverage, "Average coverage")
 
 ```
 
+# Singular value and error estimate 
+```{r}
+sVals  <- read.table("data/singular_value_summary.result", header=TRUE)
+sVals  <-  ddply(sVals, c("matrix_type", "rank"), summarise, avg_sval = mean(singular_value), avg_error = mean(error_estimate), std_sval = sd(singular_value), std_error = sd(error_estimate))
+ggplot(data=sVals, aes(x = rank, y=avg_sval, colour=matrix_type)) + geom_point(alpha=0.3) + labs(x="Rank",y="Average singular value")
+ggplot(data=sVals, aes(x = rank, y=avg_error, colour=matrix_type)) + geom_point(alpha=0.3) + labs(x="Rank",y="Average singular value")
+```
+
+
 I don't know how to explain both the superior of TFIDF but its lower coverage than the other two metrics. Perhaps with TF-IDF the first ranks captured by SVD are more accurate. 
 
 # Distribution of max precision 
