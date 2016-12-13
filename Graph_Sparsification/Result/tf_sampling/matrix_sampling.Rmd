@@ -71,12 +71,6 @@ all$id <- as.factor(all$id)
 all$type <- as.factor(all$type)
 ```
 
-What the data look like
-```{r}
-head(all)
-str(all)
-```
-
 ## Analyzing data
 
 For each grouping of id-rate-nsv, calculate the mean variance and the standard devi
@@ -86,23 +80,16 @@ tfidf_summary <- all[all$type=="tfidf", ] %>% dplyr::group_by(id, rate, nsv) %>%
 tf_summary <- all[all$type=="tf", ] %>% dplyr::group_by(id, rate, nsv) %>% dplyr::summarise_at(c("variance", "forbenius"), c("mean", "sd")) %>% dplyr::mutate(cov = variance_mean / forbenius_mean)
 ```
 
-```{r}
-head(tf_summary)
-```
-
 ## Result
 
-Excluding id 9 to make the facet-wrap 3 by 3. Don't worry, it's not an outlier. 
-```{r}
-tf_summary <- tf_summary[tf_summary$id != "9",]
-tfidf_summary <- tfidf_summary[tfidf_summary$id != "9",]
-```
-
-
+Excluding id 93 to make the facet-wrap 3 by 3. Don't worry, it's not an outlier. 
 ```{r tf_coverage}
+tf_summary <- tf_summary[tf_summary$id != "93",]
+tfidf_summary <- tfidf_summary[tfidf_summary$id != "93",]
 # Plot the one for tf 
 ggplot(tf_summary, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() + facet_wrap(~id)
 ```
+
 From this plot we can see that lower sampling rate result in smaller coverage, which is measured by taking the ratio of the variance (of given number of singular values) and forbenius norm. The lines are relatively flat and this is consistent across different matrices. This means we could sample the matrix and the same number of singular values would still be representative enough compare to a matrix that's not sampled. 
 
 ```{r tf_tfidf_coverage}
@@ -120,6 +107,32 @@ Therefore, I'll try sampling AFTER converting to TFIDF next time.
 
 From the look of the graph though, the curves are quite flat and sampling seems to be able to give us a good idea of coverage. 
 
+## Look at error estimates and singular values
+```{r erorr_estimate, warning=FALSE}
+# Data process. Loading from my own project space because I don't want to commit the result file. 
+svals_tf <- read.table("/projects/slin_prj/PubMed_Experiment/graph_sparsification/svals_sampled_tf.result", header=TRUE)
+svals_tf <- svals_tf %>% dplyr::group_by(matrix_name, rate, rank) %>% dplyr::summarise_at(c("singular_value", "error_estimate"), c("mean", "sd"))
+svals_tf <- svals_tf %>% tidyr::separate(matrix_name, c("id"), sep = "[.]") # simplify matrix name 
+svals_tf$rate <- factor(svals_tf$rate)
+
+# Graph
+ggplot(svals_tf, aes(x=rank, y=error_estimate_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral")
+
+# Excluding 93 to see the others better. 
+ggplot(svals_tf[svals_tf$id != "93", ], aes(x=rank, y=error_estimate_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + ylab("mean error estimate")
+```
+From the look of it, the error estimate are similar for matrices sampled at different rate. Powergraph's error of singular value estimates are similar for the same matrix sampled at different rate. 
+
+A look at the singular values 
+
+```{r mean_svals, warning=FALSE}
+ggplot(svals_tf, aes(x=rank, y=singular_value_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + ylab("singular value")
+
+# Exclude 93 for 3 by 3 
+ggplot(svals_tf[svals_tf$id != "93", ], aes(x=rank, y=singular_value_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + ylab("singular value")
+``` 
+
+Singular values are greater for those that are sampled at a higher rate and decay slower. 
 
 ## Running time
 
@@ -140,7 +153,6 @@ get_summary <- function(data) {
   summary <- data %>% dplyr::group_by(matrix_name, sample_rate) %>% dplyr::summarise_at(c("run_time"), c("mean", "sd")) %>% dplyr::mutate(de = sd/sqrt(3) )
 }
 run_time_summary <- get_summary(run_time)
-head(run_time_summary)
 ```
 
 Graph result 
@@ -177,7 +189,6 @@ get_summary <- function(data) {
   summary <- data %>% dplyr::group_by(matrix_name, sample_rate) %>% dplyr::summarise_at(c("n_entries"), c("mean", "sd")) %>% dplyr::mutate(de = sd/sqrt(3) )
 }
 sparsity_summary <- get_summary(sparsity)
-head(sparsity_summary)
 ```
 
 Graph result 

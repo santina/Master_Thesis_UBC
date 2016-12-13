@@ -16,13 +16,6 @@ Setting up the required packages and import the data
 library(ggplot2)
 library(plyr) # note to self: load this before dplyr always. 
 library(dplyr)
-```
-
-```
-## Warning: package 'dplyr' was built under R version 3.2.5
-```
-
-```r
 library(magrittr)
 ```
 
@@ -74,38 +67,6 @@ all$id <- as.factor(all$id)
 all$type <- as.factor(all$type)
 ```
 
-What the data look like
-
-```r
-head(all)
-```
-
-```
-##   id type rate replicate forbenius maxAcceptableNSV variance nsv
-## 1 99   tf  0.7         1    635283              613 335490.4 200
-## 2 99   tf  0.7         1    635283              613 419603.2 400
-## 3 99   tf  0.7         1    635283              613 466214.0 600
-## 4 99   tf  0.7         1    635283              613 495557.8 800
-## 5 97   tf  0.3         2    203749              627 101476.5 200
-## 6 97   tf  0.3         2    203749              627 129923.9 400
-```
-
-```r
-str(all)
-```
-
-```
-## 'data.frame':	2240 obs. of  8 variables:
-##  $ id              : Factor w/ 10 levels "9","90","91",..: 10 10 10 10 8 8 8 8 6 6 ...
-##  $ type            : Factor w/ 2 levels "tf","tfidf": 1 1 1 1 1 1 1 1 1 1 ...
-##  $ rate            : num  0.7 0.7 0.7 0.7 0.3 0.3 0.3 0.3 0.6 0.6 ...
-##  $ replicate       : chr  "1" "1" "1" "1" ...
-##  $ forbenius       : num  635283 635283 635283 635283 203749 ...
-##  $ maxAcceptableNSV: int  613 613 613 613 627 627 627 627 632 632 ...
-##  $ variance        : num  335490 419603 466214 495558 101476 ...
-##  $ nsv             : Factor w/ 4 levels "200","400","600",..: 1 2 3 4 1 2 3 4 1 2 ...
-```
-
 ## Analyzing data
 
 For each grouping of id-rate-nsv, calculate the mean variance and the standard devi
@@ -116,43 +77,19 @@ tfidf_summary <- all[all$type=="tfidf", ] %>% dplyr::group_by(id, rate, nsv) %>%
 tf_summary <- all[all$type=="tf", ] %>% dplyr::group_by(id, rate, nsv) %>% dplyr::summarise_at(c("variance", "forbenius"), c("mean", "sd")) %>% dplyr::mutate(cov = variance_mean / forbenius_mean)
 ```
 
-
-```r
-head(tf_summary)
-```
-
-```
-## Source: local data frame [6 x 8]
-## Groups: id, rate [2]
-## 
-##       id  rate    nsv variance_mean forbenius_mean variance_sd
-##   <fctr> <dbl> <fctr>         <dbl>          <dbl>       <dbl>
-## 1      9   0.1    200      22200.37       45839.67    239.8174
-## 2      9   0.1    400      28740.32       45839.67    227.9617
-## 3      9   0.1    600      32516.21       45839.67    188.0740
-## 4      9   0.1    800      34897.89       45839.67    180.0108
-## 5      9   0.2    200      54406.88      108437.33    186.6935
-## 6      9   0.2    400      69501.83      108437.33    237.3301
-## # ... with 2 more variables: forbenius_sd <dbl>, cov <dbl>
-```
-
 ## Result
 
-Excluding id 9 to make the facet-wrap 3 by 3. Don't worry, it's not an outlier. 
+Excluding id 93 to make the facet-wrap 3 by 3. Don't worry, it's not an outlier. 
 
 ```r
-tf_summary <- tf_summary[tf_summary$id != "9",]
-tfidf_summary <- tfidf_summary[tfidf_summary$id != "9",]
-```
-
-
-
-```r
+tf_summary <- tf_summary[tf_summary$id != "93",]
+tfidf_summary <- tfidf_summary[tfidf_summary$id != "93",]
 # Plot the one for tf 
 ggplot(tf_summary, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() + facet_wrap(~id)
 ```
 
-![](matrix_sampling_files/figure-html/tf_coverage-1.png)\
+![](matrix_sampling_files/figure-html/tf_coverage-1.png)<!-- -->
+
 From this plot we can see that lower sampling rate result in smaller coverage, which is measured by taking the ratio of the variance (of given number of singular values) and forbenius norm. The lines are relatively flat and this is consistent across different matrices. This means we could sample the matrix and the same number of singular values would still be representative enough compare to a matrix that's not sampled. 
 
 
@@ -161,7 +98,7 @@ From this plot we can see that lower sampling rate result in smaller coverage, w
 ggplot(tfidf_summary, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() + facet_wrap(~id)
 ```
 
-![](matrix_sampling_files/figure-html/tf_tfidf_coverage-1.png)\
+![](matrix_sampling_files/figure-html/tf_tfidf_coverage-1.png)<!-- -->
 
 After some thoughts, I realize that sampling the matrix by taking a subset of the word occurences using a probability rate AND THEN convert the result into TFIDF doesn't really make sense. 
 
@@ -173,6 +110,46 @@ Therefore, I'll try sampling AFTER converting to TFIDF next time.
 
 From the look of the graph though, the curves are quite flat and sampling seems to be able to give us a good idea of coverage. 
 
+## Look at error estimates and singular values
+
+```r
+# Data process. Loading from my own project space because I don't want to commit the result file. 
+svals_tf <- read.table("/projects/slin_prj/PubMed_Experiment/graph_sparsification/svals_sampled_tf.result", header=TRUE)
+svals_tf <- svals_tf %>% dplyr::group_by(matrix_name, rate, rank) %>% dplyr::summarise_at(c("singular_value", "error_estimate"), c("mean", "sd"))
+svals_tf <- svals_tf %>% tidyr::separate(matrix_name, c("id"), sep = "[.]") # simplify matrix name 
+svals_tf$rate <- factor(svals_tf$rate)
+
+# Graph
+ggplot(svals_tf, aes(x=rank, y=error_estimate_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral")
+```
+
+![](matrix_sampling_files/figure-html/erorr_estimate-1.png)<!-- -->
+
+```r
+# Excluding 93 to see the others better. 
+ggplot(svals_tf[svals_tf$id != "93", ], aes(x=rank, y=error_estimate_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + ylab("mean error estimate")
+```
+
+![](matrix_sampling_files/figure-html/erorr_estimate-2.png)<!-- -->
+From the look of it, the error estimate are similar for matrices sampled at different rate. Powergraph's error of singular value estimates are similar for the same matrix sampled at different rate. 
+
+A look at the singular values 
+
+
+```r
+ggplot(svals_tf, aes(x=rank, y=singular_value_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + ylab("singular value")
+```
+
+![](matrix_sampling_files/figure-html/mean_svals-1.png)<!-- -->
+
+```r
+# Exclude 93 for 3 by 3 
+ggplot(svals_tf[svals_tf$id != "93", ], aes(x=rank, y=singular_value_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + ylab("singular value")
+```
+
+![](matrix_sampling_files/figure-html/mean_svals-2.png)<!-- -->
+
+Singular values are greater for those that are sampled at a higher rate and decay slower. 
 
 ## Running time
 
@@ -195,21 +172,6 @@ get_summary <- function(data) {
   summary <- data %>% dplyr::group_by(matrix_name, sample_rate) %>% dplyr::summarise_at(c("run_time"), c("mean", "sd")) %>% dplyr::mutate(de = sd/sqrt(3) )
 }
 run_time_summary <- get_summary(run_time)
-head(run_time_summary)
-```
-
-```
-## Source: local data frame [6 x 5]
-## Groups: matrix_name [1]
-## 
-##   matrix_name sample_rate     mean       sd        de
-##        <fctr>       <dbl>    <dbl>    <dbl>     <dbl>
-## 1           9         0.1 281.1663 2.243410 1.2952335
-## 2           9         0.2 302.0427 3.329655 1.9223772
-## 3           9         0.3 309.7610 8.837418 5.1022854
-## 4           9         0.4 310.2207 2.714430 1.5671769
-## 5           9         0.5 325.3613 0.564532 0.3259327
-## 6           9         0.6 327.7363 7.276033 4.2008195
 ```
 
 Graph result 
@@ -219,7 +181,7 @@ Graph result
 ggplot(run_time_summary, aes(x = sample_rate, y = mean)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name)
 ```
 
-![](matrix_sampling_files/figure-html/runningtime_tfidf_summary-1.png)\
+![](matrix_sampling_files/figure-html/runningtime_tfidf_summary-1.png)<!-- -->
 
 Make 3 by 3 
 
@@ -227,7 +189,7 @@ Make 3 by 3
 ggplot(run_time_summary[run_time_summary$matrix_name!="98", ], aes(x = sample_rate, y = mean)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name)
 ```
 
-![](matrix_sampling_files/figure-html/runningtime_tfidf_3by3-1.png)\
+![](matrix_sampling_files/figure-html/runningtime_tfidf_3by3-1.png)<!-- -->
 
 Combine all matrices
 
@@ -236,7 +198,7 @@ Combine all matrices
 ggplot(run_time_summary[run_time_summary$matrix_name!="98", ], aes(x = sample_rate, y = mean)) + geom_point() + stat_summary(fun.y = mean, geom="line", size=1.0)
 ```
 
-![](matrix_sampling_files/figure-html/runningtime_tfidf_all_matrices-1.png)\
+![](matrix_sampling_files/figure-html/runningtime_tfidf_all_matrices-1.png)<!-- -->
 
 
 ## Sparsity 
@@ -267,21 +229,6 @@ get_summary <- function(data) {
   summary <- data %>% dplyr::group_by(matrix_name, sample_rate) %>% dplyr::summarise_at(c("n_entries"), c("mean", "sd")) %>% dplyr::mutate(de = sd/sqrt(3) )
 }
 sparsity_summary <- get_summary(sparsity)
-head(sparsity_summary)
-```
-
-```
-## Source: local data frame [6 x 5]
-## Groups: matrix_name [1]
-## 
-##   matrix_name sample_rate      mean       sd        de
-##        <fctr>       <dbl>     <dbl>    <dbl>     <dbl>
-## 1           9         0.1  34212.67 168.2033  97.11219
-## 2           9         0.2  63557.33 140.9054  81.35177
-## 3           9         0.3  89289.33 333.0005 192.25793
-## 4           9         0.4 112490.67 241.2164 139.26633
-## 5           9         0.5 133667.67 220.2733 127.17486
-## 6           9         0.6 153599.33 274.0663 158.23225
 ```
 
 Graph result 
@@ -291,7 +238,7 @@ Graph result
 ggplot(sparsity_summary, aes(x = sample_rate, y = mean)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name)
 ```
 
-![](matrix_sampling_files/figure-html/sparsity_tfidf_summary-1.png)\
+![](matrix_sampling_files/figure-html/sparsity_tfidf_summary-1.png)<!-- -->
 
 Make 3 by 3 
 
@@ -299,7 +246,7 @@ Make 3 by 3
 ggplot(sparsity_summary[sparsity_summary$matrix_name!="9", ], aes(x = sample_rate, y = mean)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name)
 ```
 
-![](matrix_sampling_files/figure-html/sparsity_tfidf_3by3-1.png)\
+![](matrix_sampling_files/figure-html/sparsity_tfidf_3by3-1.png)<!-- -->
 
 Sampling is fairly consistent at producing matrices with the same sparsity. 
 
@@ -309,4 +256,4 @@ Combine different matrices together
 ggplot(sparsity_summary, aes(x = sample_rate, y = mean)) + geom_point() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) + stat_summary(fun.y = mean, geom="line", size=1.0)
 ```
 
-![](matrix_sampling_files/figure-html/sparsity_tfidf_allmatrices-1.png)\
+![](matrix_sampling_files/figure-html/sparsity_tfidf_allmatrices-1.png)<!-- -->
