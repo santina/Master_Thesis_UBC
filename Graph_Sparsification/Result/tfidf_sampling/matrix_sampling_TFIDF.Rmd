@@ -63,7 +63,6 @@ all$scalar <- as.factor(all$scalar)
 get_summary <- function(data) {
   summary <- data %>% dplyr::group_by(matrix_name, rate, nsv, scalar) %>% dplyr::summarise_at(c("variance", "forbenius"), c("mean", "sd")) %>% dplyr::mutate(cov = variance_mean / forbenius_mean)
 }
-
 tfidf_summary <- get_summary(all)
 ```
 
@@ -104,6 +103,32 @@ all_1000 <- rbind(tfidf_original, tfidf[tfidf$scalar==1000,])
 all_1000 <- get_summary(all_1000)
 ggplot(all_1000, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name)
 ```
+
+## Look at error estimates and singular values
+```{r erorr_estimate, warning=FALSE}
+# Data process. Loading from my own project space because I don't want to commit the result file. 
+svals_tfidf <- read.table("/projects/slin_prj/PubMed_Experiment/graph_sparsification/svals_sampled_tfidf.result", header=TRUE)
+svals_tfidf <- svals_tfidf %>% dplyr::group_by(matrix_name, rate, multiplier, rank) %>% dplyr::summarise_at(c("singular_value", "error_estimate"), c("mean", "sd"))
+svals_tfidf <- svals_tfidf %>% tidyr::separate(matrix_name, c("id"), sep = "[.]") # simplify matrix name 
+svals_tfidf$rate <- factor(svals_tfidf$rate)
+```
+
+For multiplier = 10 
+```{r multiplier_10}
+
+# Excluding 93 to see the others better. 
+ggplot(svals_tfidf[c(svals_tfidf$id != "93", svals_tfidf$multiplier==10), ], aes(x=rank, y=error_estimate_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + ylab("singular values")
+```
+From the look of it, the error estimate are similar for matrices sampled at different rate. Powergraph's error of singular value estimates are similar for the same matrix sampled at different rate. 
+
+A look at the singular values 
+
+```{r mean_svals, warning=FALSE}
+ggplot(svals_tfidf, aes(x=rank, y=singular_value_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + ylab("singular value")
+
+# Exclude 93 for 3 by 3 
+ggplot(svals_tfidf[svals_tfidf$id != "93", ], aes(x=rank, y=singular_value_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + ylab("singular value")
+``` 
 
 ## Running time 
 

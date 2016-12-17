@@ -18,13 +18,6 @@ Setting up the required packages and import the data
 library(ggplot2)
 library(plyr) # note to self: load this before dplyr always. 
 library(dplyr)
-```
-
-```
-## Warning: package 'dplyr' was built under R version 3.2.5
-```
-
-```r
 library(magrittr)
 ```
 Get the data
@@ -90,7 +83,6 @@ all$scalar <- as.factor(all$scalar)
 get_summary <- function(data) {
   summary <- data %>% dplyr::group_by(matrix_name, rate, nsv, scalar) %>% dplyr::summarise_at(c("variance", "forbenius"), c("mean", "sd")) %>% dplyr::mutate(cov = variance_mean / forbenius_mean)
 }
-
 tfidf_summary <- get_summary(all)
 ```
 
@@ -102,7 +94,7 @@ tfidf_summary <- get_summary(all)
 ggplot(tfidf_summary, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + facet_wrap(~matrix_name)
 ```
 
-![](matrix_sampling_TFIDF_files/figure-html/tfidf_coverage-1.png)\
+![](matrix_sampling_TFIDF_files/figure-html/tfidf_coverage-1.png)<!-- -->
 
 ## See the difference in scalar
 
@@ -123,7 +115,7 @@ all_10 <- get_summary(all_10)
 ggplot(all_10, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name)
 ```
 
-![](matrix_sampling_TFIDF_files/figure-html/tfidf_coverage_scalar10-1.png)\
+![](matrix_sampling_TFIDF_files/figure-html/tfidf_coverage_scalar10-1.png)<!-- -->
 
 Scalar = 100
 
@@ -133,7 +125,7 @@ all_100 <- get_summary(all_100)
 ggplot(all_100, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name)
 ```
 
-![](matrix_sampling_TFIDF_files/figure-html/tfidf_coverage_scalar100-1.png)\
+![](matrix_sampling_TFIDF_files/figure-html/tfidf_coverage_scalar100-1.png)<!-- -->
 
 Scalar = 1000
 
@@ -143,7 +135,47 @@ all_1000 <- get_summary(all_1000)
 ggplot(all_1000, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name)
 ```
 
-![](matrix_sampling_TFIDF_files/figure-html/tfidf_coverage_scalar1000-1.png)\
+![](matrix_sampling_TFIDF_files/figure-html/tfidf_coverage_scalar1000-1.png)<!-- -->
+
+## Look at error estimates and singular values
+
+```r
+# Data process. Loading from my own project space because I don't want to commit the result file. 
+svals_tfidf <- read.table("/projects/slin_prj/PubMed_Experiment/graph_sparsification/svals_sampled_tfidf.result", header=TRUE)
+svals_tfidf <- svals_tfidf %>% dplyr::group_by(matrix_name, rate, multiplier, rank) %>% dplyr::summarise_at(c("singular_value", "error_estimate"), c("mean", "sd"))
+svals_tfidf <- svals_tfidf %>% tidyr::separate(matrix_name, c("id"), sep = "[.]") # simplify matrix name 
+svals_tfidf$rate <- factor(svals_tfidf$rate)
+```
+
+For multiplier = 10 
+
+```r
+# Excluding 93 to see the others better. 
+ggplot(svals_tfidf[c(svals_tfidf$id != "93", svals_tfidf$multiplier==10), ], aes(x=rank, y=error_estimate_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + ylab("singular values")
+```
+
+```
+## Warning: Removed 49901 rows containing missing values (geom_point).
+```
+
+![](matrix_sampling_TFIDF_files/figure-html/multiplier_10-1.png)<!-- -->
+From the look of it, the error estimate are similar for matrices sampled at different rate. Powergraph's error of singular value estimates are similar for the same matrix sampled at different rate. 
+
+A look at the singular values 
+
+
+```r
+ggplot(svals_tfidf, aes(x=rank, y=singular_value_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + ylab("singular value")
+```
+
+![](matrix_sampling_TFIDF_files/figure-html/mean_svals-1.png)<!-- -->
+
+```r
+# Exclude 93 for 3 by 3 
+ggplot(svals_tfidf[svals_tfidf$id != "93", ], aes(x=rank, y=singular_value_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + ylab("singular value")
+```
+
+![](matrix_sampling_TFIDF_files/figure-html/mean_svals-2.png)<!-- -->
 
 ## Running time 
 
@@ -278,7 +310,7 @@ Graph result
 ggplot(run_time_summary, aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name)
 ```
 
-![](matrix_sampling_TFIDF_files/figure-html/runningtime_tfidf_summary-1.png)\
+![](matrix_sampling_TFIDF_files/figure-html/runningtime_tfidf_summary-1.png)<!-- -->
 
 Remove 90, 91, and 92 to show the data better. 
 
@@ -287,7 +319,7 @@ run_time_summary_subset <- subset(run_time_summary, !matrix_name %in% c("90", "9
 ggplot(run_time_summary_subset, aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name)
 ```
 
-![](matrix_sampling_TFIDF_files/figure-html/runningtime_tfidf_no_outliers-1.png)\
+![](matrix_sampling_TFIDF_files/figure-html/runningtime_tfidf_no_outliers-1.png)<!-- -->
 
 
 ## Sparsity 
@@ -423,7 +455,7 @@ Graph result
 ggplot(sparsity_summary, aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name)
 ```
 
-![](matrix_sampling_TFIDF_files/figure-html/sparsity_tfidf_summary-1.png)\
+![](matrix_sampling_TFIDF_files/figure-html/sparsity_tfidf_summary-1.png)<!-- -->
 
 Make 3 by 3 
 
@@ -431,6 +463,6 @@ Make 3 by 3
 ggplot(sparsity_summary[sparsity_summary$matrix_name!="9", ], aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name)
 ```
 
-![](matrix_sampling_TFIDF_files/figure-html/sparsity_tfidf_3by3-1.png)\
+![](matrix_sampling_TFIDF_files/figure-html/sparsity_tfidf_3by3-1.png)<!-- -->
 
 
