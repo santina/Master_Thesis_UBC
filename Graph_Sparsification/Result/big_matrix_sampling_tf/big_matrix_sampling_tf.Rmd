@@ -1,0 +1,51 @@
+---
+title: "Analysis of the singular values"
+author: "Santina Lin"
+date: "December 17, 2016"
+output: 
+  html_document:
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+## Data 
+
+The tf matrix was sampled at 0.1 rate and was SVD with nsv=2000. 
+
+We'll look at the log file of the GraphLab output from running collaborative filtering on this matrix. 
+```{r}
+singular_value <- read.table("sval_tf_r0.1_nsv2000.summary", header=TRUE)
+head(singular_value)
+``` 
+
+### Error estimates 
+
+First let's plot the error 
+```{r error_estimates}
+ggplot(singular_value, aes(x = rank, y = error_estimate)) + geom_point(size=1, alpha=0.6) + ylab("Error estimate") + xlab("Rank") + theme_bw()
+```
+
+```{r available_nsv}
+nsv <- sum(singular_value$error_estimate < 0.5)
+nsv
+singular_value$error_estimate[nsv]
+singular_value$error_estimate[nsv+1]
+```
+
+### Singular values 
+
+Plotting the singular value
+```{r singular_value_plot}
+ggplot(singular_value, aes(x = rank, y = singular_value)) + geom_point(size=1, alpha=0.6) + ylab("Singular value") + xlab("Rank") + theme_bw()
+```
+
+As expected in this sanity check, it's a downward curve that drops in tangential slope sharply after the first few singular value. 
+
+### Conclusion
+
+From the error estimation, we'll be using about `r nsv` nsv to run GraphLab on our original big matrix.  
+
