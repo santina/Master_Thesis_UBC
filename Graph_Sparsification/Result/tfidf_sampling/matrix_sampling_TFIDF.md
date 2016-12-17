@@ -91,7 +91,7 @@ tfidf_summary <- get_summary(all)
 
 ```r
 # Plot tfidf 
-ggplot(tfidf_summary, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + facet_wrap(~matrix_name)
+ggplot(tfidf_summary, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + facet_wrap(~matrix_name) + theme_bw()
 ```
 
 ![](matrix_sampling_TFIDF_files/figure-html/tfidf_coverage-1.png)<!-- -->
@@ -112,7 +112,7 @@ Scalar = 10
 # Create different data.frame for different scalar group (including the sample = 1 group)
 all_10 <- rbind(tfidf_original, tfidf[tfidf$scalar==10,])
 all_10 <- get_summary(all_10)
-ggplot(all_10, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name)
+ggplot(all_10, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name) + theme_bw()
 ```
 
 ![](matrix_sampling_TFIDF_files/figure-html/tfidf_coverage_scalar10-1.png)<!-- -->
@@ -122,7 +122,7 @@ Scalar = 100
 ```r
 all_100 <- rbind(tfidf_original, tfidf[tfidf$scalar==100,])
 all_100 <- get_summary(all_100)
-ggplot(all_100, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name)
+ggplot(all_100, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name) + theme_bw()
 ```
 
 ![](matrix_sampling_TFIDF_files/figure-html/tfidf_coverage_scalar100-1.png)<!-- -->
@@ -132,7 +132,7 @@ Scalar = 1000
 ```r
 all_1000 <- rbind(tfidf_original, tfidf[tfidf$scalar==1000,])
 all_1000 <- get_summary(all_1000)
-ggplot(all_1000, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name)
+ggplot(all_1000, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name) + theme_bw()
 ```
 
 ![](matrix_sampling_TFIDF_files/figure-html/tfidf_coverage_scalar1000-1.png)<!-- -->
@@ -151,7 +151,7 @@ For multiplier = 10
 
 ```r
 # Excluding 93 to see the others better. 
-ggplot(svals_tfidf[c(svals_tfidf$id != "93", svals_tfidf$multiplier==10), ], aes(x=rank, y=error_estimate_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + ylab("singular values")
+ggplot(svals_tfidf[c(svals_tfidf$id != "93", svals_tfidf$multiplier==10), ], aes(x=rank, y=error_estimate_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + ylab("singular values") + theme_bw()
 ```
 
 ```
@@ -165,14 +165,14 @@ A look at the singular values
 
 
 ```r
-ggplot(svals_tfidf, aes(x=rank, y=singular_value_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + ylab("singular value")
+ggplot(svals_tfidf, aes(x=rank, y=singular_value_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + ylab("singular value") + theme_bw()
 ```
 
 ![](matrix_sampling_TFIDF_files/figure-html/mean_svals-1.png)<!-- -->
 
 ```r
 # Exclude 93 for 3 by 3 
-ggplot(svals_tfidf[svals_tfidf$id != "93", ], aes(x=rank, y=singular_value_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + ylab("singular value")
+ggplot(svals_tfidf[svals_tfidf$id != "93", ], aes(x=rank, y=singular_value_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + ylab("singular value") + theme_bw()
 ```
 
 ![](matrix_sampling_TFIDF_files/figure-html/mean_svals-2.png)<!-- -->
@@ -307,7 +307,7 @@ Graph result
 
 
 ```r
-ggplot(run_time_summary, aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name)
+ggplot(run_time_summary, aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name) + theme_bw()
 ```
 
 ![](matrix_sampling_TFIDF_files/figure-html/runningtime_tfidf_summary-1.png)<!-- -->
@@ -316,7 +316,7 @@ Remove 90, 91, and 92 to show the data better.
 
 ```r
 run_time_summary_subset <- subset(run_time_summary, !matrix_name %in% c("90", "91", "92"))
-ggplot(run_time_summary_subset, aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name)
+ggplot(run_time_summary_subset, aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name) + theme_bw()
 ```
 
 ![](matrix_sampling_TFIDF_files/figure-html/runningtime_tfidf_no_outliers-1.png)<!-- -->
@@ -452,7 +452,7 @@ Graph result
 
 
 ```r
-ggplot(sparsity_summary, aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name)
+ggplot(sparsity_summary, aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name) + theme_bw()
 ```
 
 ![](matrix_sampling_TFIDF_files/figure-html/sparsity_tfidf_summary-1.png)<!-- -->
@@ -460,7 +460,7 @@ ggplot(sparsity_summary, aes(x = sample_rate, y = mean, colour = scalar, group =
 Make 3 by 3 
 
 ```r
-ggplot(sparsity_summary[sparsity_summary$matrix_name!="9", ], aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name)
+ggplot(sparsity_summary[sparsity_summary$matrix_name!="9", ], aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name) + theme_bw()
 ```
 
 ![](matrix_sampling_TFIDF_files/figure-html/sparsity_tfidf_3by3-1.png)<!-- -->
