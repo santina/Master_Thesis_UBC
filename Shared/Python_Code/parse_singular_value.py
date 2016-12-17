@@ -25,6 +25,7 @@ def write_summary(singular_file, out_file):
         for line in f:
             if "Error estimate:" in line:
                 rank, sval, error = parse_line(line)
+                rank = str( int(rank) + 1 )
                 data = map(str, [rank, sval, error])
                 out.write("\t".join(data) + '\n')
 
