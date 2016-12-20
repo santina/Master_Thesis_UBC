@@ -23,7 +23,7 @@ library(dplyr)
 We'll look at the log file of the GraphLab output from running collaborative filtering on this matrix. 
 
 ```r
-singular_value <- read.table("singular_val.summary", header=TRUE)
+singular_value <- read.table("sVals_sampled_matrix_2000_100X0.01.summary", header=TRUE)
 head(singular_value)
 ```
 
@@ -51,19 +51,11 @@ It's clear that after some nsv, the error jumps up significantly, so we do not w
 
 ```r
 nsv <- sum(singular_value$error_estimate < 0.5)
-singular_value$error_estimate[nsv]
+nsv
 ```
 
 ```
-## [1] 0.326936
-```
-
-```r
-singular_value$error_estimate[nsv+1]
-```
-
-```
-## [1] 1.95962
+## [1] 973
 ```
 
 ### Singular values 
@@ -92,7 +84,7 @@ We used GraphLab to estimate 1100 singular values on the full tfidf matrix.
 First let's plot the error 
 
 ```r
-singularval_fullmatrix <- read.table("singularval_fullmatrix.summary", header=TRUE)
+singularval_fullmatrix <- read.table("sVals_full_matrix_1100.summary", header=TRUE)
 ggplot(singularval_fullmatrix, aes(x = rank, y = error_estimate)) + geom_point(size=1) + ylab("Error estimate") + xlab("Rank")
 ```
 
@@ -170,3 +162,66 @@ BAD: the coverage is low.
 
 GOOD: the two matrices agree with each other in terms of coverage. 
 
+# Compare with big matrix with more singular values
+
+I repeated the previous step on the full matrix but this time with more singular values, so hopefully the error are smaller for the first 1000 singular values 
+
+## Error estimates
+
+
+```r
+svals_full <- read.table("sVals_full_matrix_2000.summary", header=TRUE)
+ggplot(svals_full, aes(x = rank, y = error_estimate)) + geom_point(size=1) + ylab("Error estimate") + xlab("Rank") + theme_bw()
+```
+
+![](big_matrix_sampling_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+
+```r
+nsv <- sum(svals_full$error_estimate < 0.5)
+nsv
+```
+
+```
+## [1] 988
+```
+
+## singular values 
+
+
+```r
+ggplot(svals_full, aes(x = rank, y = singular_value)) + geom_point(size=1) + ylab("Singular value") + xlab("Rank") + theme_bw()
+```
+
+![](big_matrix_sampling_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
+## comparison with sampled matrix 
+
+Singular values 
+
+```r
+svals_full$matrix <- factor("full matrix")
+svals <- rbind(svals_full, singular_value)
+ggplot(svals, aes(x = rank, y = singular_value, colour=matrix)) + geom_point(size=1) + ylab("Singular value") + xlab("Rank") + theme_bw() + theme(legend.title=element_blank())
+```
+
+![](big_matrix_sampling_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+
+Error estimates
+
+```r
+ggplot(svals, aes(x = rank, y = error_estimate, colour=matrix)) + geom_point(size=1, alpha=0.5) + ylab("Error estimate") + xlab("Rank") + theme_bw() + theme(legend.title=element_blank())
+```
+
+![](big_matrix_sampling_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+
+Coverage
+
+```r
+full_matrix_2000nsv_cov <- read.table("nsv_coverage_full_matrix_tfidf2000.result", header=TRUE)
+full_matrix_2000nsv_cov$matrix  <- factor("full matrix")
+coverage <- rbind(sampled_100X_0.01_2000nsv_cov, full_matrix_2000nsv_cov)
+
+ggplot(coverage, aes(x = nsv, y = coverage, colour=matrix)) + geom_point(size=1) + ylab("coverage") + xlab("# singular values") + theme_bw() + theme(legend.title=element_blank())
+```
+
+![](big_matrix_sampling_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
