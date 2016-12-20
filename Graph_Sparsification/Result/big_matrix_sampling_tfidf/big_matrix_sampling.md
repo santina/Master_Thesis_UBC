@@ -42,7 +42,7 @@ head(singular_value)
 First let's plot the error 
 
 ```r
-ggplot(singular_value, aes(x = rank, y = error_estimate)) + geom_point(size=1) + ylab("Error estimate") + xlab("Rank")
+ggplot(singular_value, aes(x = rank, y = error_estimate)) + geom_point(size=1, alpha=0.5) + ylab("Error estimate") + xlab("Rank") + theme_bw() 
 ```
 
 ![](big_matrix_sampling_files/figure-html/error_estimates-1.png)<!-- -->
@@ -63,7 +63,7 @@ nsv
 Plotting the singular value
 
 ```r
-ggplot(singular_value, aes(x = rank, y = singular_value)) + geom_point(size=1) + ylab("Singular value") + xlab("Rank")
+ggplot(singular_value, aes(x = rank, y = singular_value)) + geom_point(size=1) + ylab("Singular value") + xlab("Rank") + theme_bw() 
 ```
 
 ![](big_matrix_sampling_files/figure-html/singular_value_plot-1.png)<!-- -->
@@ -85,7 +85,7 @@ First let's plot the error
 
 ```r
 singularval_fullmatrix <- read.table("sVals_full_matrix_1100.summary", header=TRUE)
-ggplot(singularval_fullmatrix, aes(x = rank, y = error_estimate)) + geom_point(size=1) + ylab("Error estimate") + xlab("Rank")
+ggplot(singularval_fullmatrix, aes(x = rank, y = error_estimate)) + geom_point(size=1, alpha=0.5) + ylab("Error estimate") + xlab("Rank")
 ```
 
 ![](big_matrix_sampling_files/figure-html/error_estimates_fullmatrix-1.png)<!-- -->
@@ -94,25 +94,17 @@ It's clear that after some nsv, the error jumps up significantly, so we do not w
 
 ```r
 nsv <- sum(singularval_fullmatrix$error_estimate < 0.5)
-singularval_fullmatrix$error_estimate[nsv]
+nsv
 ```
 
 ```
-## [1] 0.305084
-```
-
-```r
-singularval_fullmatrix$error_estimate[nsv+1]
-```
-
-```
-## [1] 1.93905
+## [1] 529
 ```
 
 ### singular values 
 
 ```r
-ggplot(singularval_fullmatrix, aes(x = rank, y = singular_value)) + geom_point(size=1) + ylab("Singular value") + xlab("Rank")
+ggplot(singularval_fullmatrix, aes(x = rank, y = singular_value)) + geom_point(size=1) + ylab("Singular value") + xlab("Rank") + theme_bw() 
 ```
 
 ![](big_matrix_sampling_files/figure-html/singular_value_plot_fullmatrix-1.png)<!-- -->
@@ -128,7 +120,7 @@ The number of singular values measured to be useable are 529.
 singular_value$matrix <- factor("sampled matrix")
 singularval_fullmatrix$matrix <- factor("full matrix")
 svals <- rbind(singularval_fullmatrix, singular_value)
-ggplot(svals, aes(x = rank, y = singular_value, colour=matrix)) + geom_point(size=1) + ylab("Singular value") + xlab("Rank")
+ggplot(svals, aes(x = rank, y = singular_value, colour=matrix)) + geom_point(size=1) + ylab("Singular value") + xlab("Rank") + theme_bw() + theme(legend.title=element_blank())
 ```
 
 ![](big_matrix_sampling_files/figure-html/compare_svals-1.png)<!-- -->
@@ -153,7 +145,7 @@ sampled_100X_0.01_2000nsv_cov$matrix <- factor("sampled matrix")
 full_matrix_1000nsv_cov$matrix  <- factor("full matrix")
 coverage <- rbind(sampled_100X_0.01_2000nsv_cov, full_matrix_1000nsv_cov)
 
-ggplot(coverage, aes(x = nsv, y = coverage, colour=matrix)) + geom_point(size=1) + ylab("coverage") + xlab("# singular values")
+ggplot(coverage, aes(x = nsv, y = coverage, colour=matrix)) + geom_point(size=1) + ylab("coverage") + xlab("# singular values") + theme_bw() + theme(legend.title=element_blank())
 ```
 
 ![](big_matrix_sampling_files/figure-html/coverage_graph-1.png)<!-- -->
@@ -171,7 +163,7 @@ I repeated the previous step on the full matrix but this time with more singular
 
 ```r
 svals_full <- read.table("sVals_full_matrix_2000.summary", header=TRUE)
-ggplot(svals_full, aes(x = rank, y = error_estimate)) + geom_point(size=1) + ylab("Error estimate") + xlab("Rank") + theme_bw()
+ggplot(svals_full, aes(x = rank, y = error_estimate)) + geom_point(size=1, alpha=0.5) + ylab("Error estimate") + xlab("Rank") + theme_bw()
 ```
 
 ![](big_matrix_sampling_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
