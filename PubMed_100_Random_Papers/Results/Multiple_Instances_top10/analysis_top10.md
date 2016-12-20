@@ -138,7 +138,7 @@ tfidf_coverage$matrixType = factor("TF-IDF")
 term_freq_coverage$matrixType = factor("Frequency")
 term_binary_coverage$matrixType = factor("Binary")
 coverage <- rbind(term_freq_coverage, term_binary_coverage, tfidf_coverage)
-coverage <- dplyr::mutate(coverage, cov = variance/forbenius)
+coverage <- dplyr::mutate(coverage, cov = frobenius/matrix_norm)
 
 # Graph
 create_curves <- function(data){
