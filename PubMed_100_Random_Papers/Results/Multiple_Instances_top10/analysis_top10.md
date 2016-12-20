@@ -4,9 +4,7 @@ November 14, 2016
 
 (this is copied pasted from "../multiple_instances/result_muliple.Rmd". The only difference is that the data source is swapped out. The graphs from this one are the ones to go into the thesis)
 
-
-This shows the result of 92 repeats of [this experiment](result.md). 
-The data are split by the type of matrices in order to decrease the time of processing 
+This shows the result of 92 repeats of small matrices experiment. The purpose is to test the precision, using PubMed as ground truth, when we use different parameters. 
 
 # Data preparation and inspection
 
@@ -18,7 +16,8 @@ library(dplyr)
 library(knitr) # kable()
 library(tidyr)
 ```
-First load the data 
+
+First load the data for top10 precision. 
 
 ```r
 # A function to prepare the data 
@@ -68,7 +67,7 @@ Lastly, we'll combine all three dataframes
 tf_idf$matrixType <- factor("TF-IDF")
 term_binary$matrixType <- factor("Binary")
 term_frequency$matrixType <- factor("Frequency")
-all_result <- rbind(tf_idf, term_binary, term_frequency)
+all_result <- rbind(term_frequency, term_binary, tf_idf)
 str(all_result) # inspect final dataframe
 ```
 
@@ -77,9 +76,9 @@ str(all_result) # inspect final dataframe
 ##  $ ExperimentNum: Factor w/ 92 levels "1","2","3","4",..: 10 10 10 10 10 10 10 10 10 10 ...
 ##  $ distFunc     : Factor w/ 2 levels "Cosine","Euclidean": 2 1 2 1 2 1 2 1 2 1 ...
 ##  $ nsv          : int  50 50 100 100 150 150 200 200 250 250 ...
-##  $ precision    : num  0.88 0.898 0.916 0.944 0.912 ...
-##  $ seconds      : num  48.57 6.97 49.93 7.21 52.54 ...
-##  $ matrixType   : Factor w/ 3 levels "TF-IDF","Binary",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ precision    : num  0.596 0.632 0.695 0.745 0.729 ...
+##  $ seconds      : num  46.62 6.21 47.71 6.35 50.34 ...
+##  $ matrixType   : Factor w/ 3 levels "Frequency","Binary",..: 1 1 1 1 1 1 1 1 1 1 ...
 ```
 
 # Average precision curves 
@@ -90,10 +89,10 @@ The lines are the means of precisions from 92 different experiments for a given 
 ```r
 create_curves <- function(data, graphTitle){
   ggplot(data, aes(x=nsv, y=precision, colour=distFunc)) + geom_point(alpha=0.1) + 
-  facet_grid(matrixType ~ .) + theme_bw() + ggtitle(graphTitle) + scale_x_continuous(expand = c(0, 0), breaks=seq(0, 1500, by=100)) + 
+  facet_grid(matrixType ~ .) + theme_bw() + ggtitle(graphTitle) + scale_x_continuous(expand = c(0, 0), breaks=seq(0, 1500, by=100)) +
   labs(x="# singular values",y="Average precision") +
-  theme(plot.title = element_text(color="#666666", face="bold", size=16, hjust=0.2, vjust=1))+ 
-  stat_summary(fun.y = mean, geom="line", size=1.5)
+  theme(plot.title = element_text(color="#666666", face="bold", size=16, hjust=0.2, vjust=1), legend.title=element_blank())+ 
+  stat_summary(fun.y = mean, geom="line", size=1.0) + scale_colour_brewer(palette="Set2")
 }
 create_curves(all_result, "Average precisions in retrieving related PubMed articles")
 ```
@@ -117,12 +116,12 @@ kable(maxima, format="markdown") # ensure Github can render the table
 
 |matrixType |distFunc  |  nsv| precision|
 |:----------|:---------|----:|---------:|
-|TF-IDF     |Cosine    | 1400| 0.9488416|
-|TF-IDF     |Euclidean |  100| 0.9044853|
-|Binary     |Cosine    | 1300| 0.8719828|
-|Binary     |Euclidean |  300| 0.6278501|
 |Frequency  |Cosine    | 1150| 0.8481930|
 |Frequency  |Euclidean |  400| 0.7449516|
+|Binary     |Cosine    | 1300| 0.8719828|
+|Binary     |Euclidean |  300| 0.6278501|
+|TF-IDF     |Cosine    | 1400| 0.9488416|
+|TF-IDF     |Euclidean |  100| 0.9044853|
 
 As demosntrated in the code: I first take the mean of precisions across all samples, for each unique combination of sample number, nsv, distance function, and matrix type. So basically an average for 92 different points. Then I get the maxima prececisions across all number of singular values for each unique combination of distance function and matrixtype. That way we know, on average, at what nsv are the maxima precision is achieved. 
 
@@ -138,18 +137,18 @@ term_binary_coverage <- read.table("data/term_binary_frobenius.result", header=T
 tfidf_coverage$matrixType = factor("TF-IDF")
 term_freq_coverage$matrixType = factor("Frequency")
 term_binary_coverage$matrixType = factor("Binary")
-coverage <- rbind(tfidf_coverage, term_freq_coverage, term_binary_coverage)
+coverage <- rbind(term_freq_coverage, term_binary_coverage, tfidf_coverage)
 coverage <- dplyr::mutate(coverage, cov = variance/forbenius)
 
 # Graph
-create_curves <- function(data, graphTitle){
-  ggplot(data, aes(x=nsv, y=cov)) + geom_point(alpha=0.1) + 
-  facet_grid(matrixType ~ .) + theme_bw() + ggtitle(graphTitle) + scale_x_continuous(expand = c(0, 0), breaks=seq(0, 1500, by=100)) + 
-  labs(x="# singular values",y="Average precision") +
-  theme(plot.title = element_text(color="#666666", face="bold", size=16, hjust=0.2, vjust=1))+ 
-  stat_summary(fun.y = mean, geom="line", size=1.5)
+create_curves <- function(data){
+  ggplot(data, aes(x=nsv, y=cov, colour=matrixType)) + geom_point(alpha=0.1) +
+  theme_bw() + scale_x_continuous(expand = c(0, 0), breaks=seq(0, 1500, by=100)) + 
+  labs(x="# singular values",y="Average coverage") + 
+  theme(plot.title = element_text(color="#666666", face="bold", size=16, hjust=0.2, vjust=1),legend.title=element_blank()) + 
+  stat_summary(fun.y = mean, geom="line", size=1.0)
 }
-create_curves(coverage, "Average coverage")
+create_curves(coverage)
 ```
 
 ![](analysis_top10_files/figure-html/coverage-1.png)<!-- -->
@@ -159,17 +158,22 @@ create_curves(coverage, "Average coverage")
 ```r
 sVals  <- read.table("data/singular_value_summary.result", header=TRUE)
 sVals  <-  ddply(sVals, c("matrix_type", "rank"), summarise, avg_sval = mean(singular_value), avg_error = mean(error_estimate), std_sval = sd(singular_value), std_error = sd(error_estimate))
-ggplot(data=sVals, aes(x = rank, y=avg_sval, colour=matrix_type)) + geom_point(alpha=0.3) + labs(x="Rank",y="Average singular value")
+
+# Rearrange and rename factors to match the first graph.
+sVals$matrix_type <- factor(sVals$matrix_type, levels=c("term_freq", "term_binary", "tf_idf"), labels=c("Frequency", "Binary", "TF-IDF"))
+
+# Plot singular value by rank plot
+ggplot(data=sVals, aes(x = rank, y=avg_sval, colour=matrix_type)) + geom_point(alpha=0.3) + labs(x="Rank",y="Average singular value") + theme_bw() + theme(legend.title=element_blank()) 
 ```
 
 ![](analysis_top10_files/figure-html/singular_val_plots-1.png)<!-- -->
 
 ```r
-ggplot(data=sVals, aes(x = rank, y=avg_error, colour=matrix_type)) + geom_point(alpha=0.3) + labs(x="Rank",y="Average error estimates")
+# Plot error by rank 
+ggplot(data=sVals, aes(x = rank, y=avg_error, colour=matrix_type)) + geom_point(alpha=0.3) + labs(x="Rank",y="Average error estimates") + theme_bw() + theme(legend.title=element_blank())
 ```
 
 ![](analysis_top10_files/figure-html/singular_val_plots-2.png)<!-- -->
-
 
 I don't know how to explain both the superior of TFIDF but its lower coverage than the other two metrics. Perhaps with TF-IDF the first ranks captured by SVD are more accurate. 
 
@@ -186,7 +190,7 @@ ggplot(max_mean, aes(x=distFunc, y=precision, fill=distFunc)) + geom_boxplot(sho
         legend.text = element_text(size=14),
         axis.text = element_text(size=12), 
         axis.title = element_text(size=14), 
-        strip.text.x = element_text(size=14))
+        strip.text.x = element_text(size=14)) + scale_fill_brewer(palette="Set2") 
 ```
 
 ![](analysis_top10_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
@@ -207,12 +211,12 @@ kable(max_mean_sd, format="markdown") # ensure Github can render the table
 
 |matrixType |distFunc  | avg_max_precision|        sd|
 |:----------|:---------|-----------------:|---------:|
-|TF-IDF     |Cosine    |         0.9540638| 0.0134976|
-|TF-IDF     |Euclidean |         0.9067123| 0.0224186|
-|Binary     |Cosine    |         0.8741209| 0.0205064|
-|Binary     |Euclidean |         0.6321046| 0.0324885|
 |Frequency  |Cosine    |         0.8517526| 0.0241156|
 |Frequency  |Euclidean |         0.7514892| 0.0312614|
+|Binary     |Cosine    |         0.8741209| 0.0205064|
+|Binary     |Euclidean |         0.6321046| 0.0324885|
+|TF-IDF     |Cosine    |         0.9540638| 0.0134976|
+|TF-IDF     |Euclidean |         0.9067123| 0.0224186|
 
 # Distribution of nsv at maxima precision 
 
@@ -227,7 +231,7 @@ ggplot(maxima_nsv, aes(x=distFunc, y=nsv, fill=distFunc)) + geom_boxplot(show.le
         legend.text = element_text(size=14),
         axis.text = element_text(size=12), 
         axis.title = element_text(size=14), 
-        strip.text.x = element_text(size=14))
+        strip.text.x = element_text(size=14)) + scale_fill_brewer(palette="Set2")
 ```
 
 ![](analysis_top10_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
@@ -243,12 +247,12 @@ kable(max_nsv_sd, format="markdown") # ensure Github can render the table
 
 |matrixType |distFunc  | avg_max_nsv|       sd|
 |:----------|:---------|-----------:|--------:|
-|TF-IDF     |Cosine    |    787.3079| 405.8333|
-|TF-IDF     |Euclidean |    701.4610| 446.7085|
-|Binary     |Cosine    |    820.6219| 404.4732|
-|Binary     |Euclidean |    534.4482| 395.5325|
 |Frequency  |Cosine    |    791.6722| 380.5501|
 |Frequency  |Euclidean |    756.7708| 402.7234|
+|Binary     |Cosine    |    820.6219| 404.4732|
+|Binary     |Euclidean |    534.4482| 395.5325|
+|TF-IDF     |Cosine    |    787.3079| 405.8333|
+|TF-IDF     |Euclidean |    701.4610| 446.7085|
 
 # Running time
 
@@ -257,7 +261,7 @@ This is to see how long the calculation takes. So it looks like using cosine fun
 
 ```r
 ggplot(all_result_means, aes(x=nsv, y=meanTime, colour=distFunc)) + geom_point() + facet_grid(matrixType ~ .) + 
-  theme_bw() + labs(x="number of singular values", y="average time") 
+  theme_bw() + labs(x="number of singular values", y="average time")  + scale_colour_brewer(palette="Set2") + theme(legend.title=element_blank())
 ```
 
 ![](analysis_top10_files/figure-html/unnamed-chunk-12-1.png)<!-- -->

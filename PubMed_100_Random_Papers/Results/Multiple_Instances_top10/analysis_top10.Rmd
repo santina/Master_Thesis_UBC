@@ -10,9 +10,7 @@ output:
 
 (this is copied pasted from "../multiple_instances/result_muliple.Rmd". The only difference is that the data source is swapped out. The graphs from this one are the ones to go into the thesis)
 
-
-This shows the result of 92 repeats of [this experiment](result.md). 
-The data are split by the type of matrices in order to decrease the time of processing 
+This shows the result of 92 repeats of small matrices experiment. The purpose is to test the precision, using PubMed as ground truth, when we use different parameters. 
 
 # Data preparation and inspection
 
@@ -23,7 +21,8 @@ library(dplyr)
 library(knitr) # kable()
 library(tidyr)
 ```
-First load the data 
+
+First load the data for top10 precision. 
 ```{r}
 # A function to prepare the data 
 prepare_data <- function(filepath){
@@ -52,7 +51,7 @@ Lastly, we'll combine all three dataframes
 tf_idf$matrixType <- factor("TF-IDF")
 term_binary$matrixType <- factor("Binary")
 term_frequency$matrixType <- factor("Frequency")
-all_result <- rbind(tf_idf, term_binary, term_frequency)
+all_result <- rbind(term_frequency, term_binary, tf_idf)
 str(all_result) # inspect final dataframe
 ```
 
@@ -63,10 +62,10 @@ The lines are the means of precisions from 92 different experiments for a given 
 ```{r}
 create_curves <- function(data, graphTitle){
   ggplot(data, aes(x=nsv, y=precision, colour=distFunc)) + geom_point(alpha=0.1) + 
-  facet_grid(matrixType ~ .) + theme_bw() + ggtitle(graphTitle) + scale_x_continuous(expand = c(0, 0), breaks=seq(0, 1500, by=100)) + 
+  facet_grid(matrixType ~ .) + theme_bw() + ggtitle(graphTitle) + scale_x_continuous(expand = c(0, 0), breaks=seq(0, 1500, by=100)) +
   labs(x="# singular values",y="Average precision") +
-  theme(plot.title = element_text(color="#666666", face="bold", size=16, hjust=0.2, vjust=1))+ 
-  stat_summary(fun.y = mean, geom="line", size=1.5)
+  theme(plot.title = element_text(color="#666666", face="bold", size=16, hjust=0.2, vjust=1), legend.title=element_blank())+ 
+  stat_summary(fun.y = mean, geom="line", size=1.0) + scale_colour_brewer(palette="Set2")
 }
 create_curves(all_result, "Average precisions in retrieving related PubMed articles")
 ```
@@ -96,29 +95,34 @@ term_binary_coverage <- read.table("data/term_binary_frobenius.result", header=T
 tfidf_coverage$matrixType = factor("TF-IDF")
 term_freq_coverage$matrixType = factor("Frequency")
 term_binary_coverage$matrixType = factor("Binary")
-coverage <- rbind(tfidf_coverage, term_freq_coverage, term_binary_coverage)
+coverage <- rbind(term_freq_coverage, term_binary_coverage, tfidf_coverage)
 coverage <- dplyr::mutate(coverage, cov = variance/forbenius)
 
 # Graph
-create_curves <- function(data, graphTitle){
-  ggplot(data, aes(x=nsv, y=cov)) + geom_point(alpha=0.1) + 
-  facet_grid(matrixType ~ .) + theme_bw() + ggtitle(graphTitle) + scale_x_continuous(expand = c(0, 0), breaks=seq(0, 1500, by=100)) + 
-  labs(x="# singular values",y="Average precision") +
-  theme(plot.title = element_text(color="#666666", face="bold", size=16, hjust=0.2, vjust=1))+ 
-  stat_summary(fun.y = mean, geom="line", size=1.5)
+create_curves <- function(data){
+  ggplot(data, aes(x=nsv, y=cov, colour=matrixType)) + geom_point(alpha=0.1) +
+  theme_bw() + scale_x_continuous(expand = c(0, 0), breaks=seq(0, 1500, by=100)) + 
+  labs(x="# singular values",y="Average coverage") + 
+  theme(plot.title = element_text(color="#666666", face="bold", size=16, hjust=0.2, vjust=1),legend.title=element_blank()) + 
+  stat_summary(fun.y = mean, geom="line", size=1.0)
 }
-create_curves(coverage, "Average coverage")
-
+create_curves(coverage)
 ```
 
 # Singular value and error estimate 
 ```{r singular_val_plots}
 sVals  <- read.table("data/singular_value_summary.result", header=TRUE)
 sVals  <-  ddply(sVals, c("matrix_type", "rank"), summarise, avg_sval = mean(singular_value), avg_error = mean(error_estimate), std_sval = sd(singular_value), std_error = sd(error_estimate))
-ggplot(data=sVals, aes(x = rank, y=avg_sval, colour=matrix_type)) + geom_point(alpha=0.3) + labs(x="Rank",y="Average singular value")
-ggplot(data=sVals, aes(x = rank, y=avg_error, colour=matrix_type)) + geom_point(alpha=0.3) + labs(x="Rank",y="Average error estimates")
-```
 
+# Rearrange and rename factors to match the first graph.
+sVals$matrix_type <- factor(sVals$matrix_type, levels=c("term_freq", "term_binary", "tf_idf"), labels=c("Frequency", "Binary", "TF-IDF"))
+
+# Plot singular value by rank plot
+ggplot(data=sVals, aes(x = rank, y=avg_sval, colour=matrix_type)) + geom_point(alpha=0.3) + labs(x="Rank",y="Average singular value") + theme_bw() + theme(legend.title=element_blank()) 
+
+# Plot error by rank 
+ggplot(data=sVals, aes(x = rank, y=avg_error, colour=matrix_type)) + geom_point(alpha=0.3) + labs(x="Rank",y="Average error estimates") + theme_bw() + theme(legend.title=element_blank())
+```
 
 I don't know how to explain both the superior of TFIDF but its lower coverage than the other two metrics. Perhaps with TF-IDF the first ranks captured by SVD are more accurate. 
 
@@ -134,13 +138,13 @@ ggplot(max_mean, aes(x=distFunc, y=precision, fill=distFunc)) + geom_boxplot(sho
         legend.text = element_text(size=14),
         axis.text = element_text(size=12), 
         axis.title = element_text(size=14), 
-        strip.text.x = element_text(size=14))
+        strip.text.x = element_text(size=14)) + scale_fill_brewer(palette="Set2") 
 ```
 
 
 ```{r, echo=FALSE, eval=FALSE}
 plot_boxplot <- function(data){
-  ggplot(data, aes(x=distFunc, y=precision, fill=distFunc)) + geom_boxplot(show.legend = FALSE) + theme_bw()
+ggplot(data, aes(x=distFunc, y=precision, fill=distFunc)) + geom_boxplot(show.legend = FALSE) + theme_bw() + scale_fill_brewer(palette="Set2")
 }
 by(max_mean, max_mean$matrixType, plot_boxplot) # generate one plot at a time
 ```
@@ -166,7 +170,7 @@ ggplot(maxima_nsv, aes(x=distFunc, y=nsv, fill=distFunc)) + geom_boxplot(show.le
         legend.text = element_text(size=14),
         axis.text = element_text(size=12), 
         axis.title = element_text(size=14), 
-        strip.text.x = element_text(size=14))
+        strip.text.x = element_text(size=14)) + scale_fill_brewer(palette="Set2")
 ```
 
 ```{r}
@@ -181,6 +185,6 @@ This is to see how long the calculation takes. So it looks like using cosine fun
 
 ```{r}
 ggplot(all_result_means, aes(x=nsv, y=meanTime, colour=distFunc)) + geom_point() + facet_grid(matrixType ~ .) + 
-  theme_bw() + labs(x="number of singular values", y="average time") 
+  theme_bw() + labs(x="number of singular values", y="average time")  + scale_colour_brewer(palette="Set2") + theme(legend.title=element_blank())
 ```
 
