@@ -4,15 +4,17 @@
 import numpy as np
 import random
 import argparse
+import math
 
 def main():
 	args = parse_arguments()
-	frob = frobenius(args.m)
-	sv = get_singular_values(args.s, args.n)
-	print "Forbenius: " + str(frob)
-	variance = getSingularVariance(sv)
-	print "Variance: " + str(variance)
-	print "Coverage: " + str(variance/frob)
+	matrix_norm = getMatrixNorm(args.m)
+	sv, error = get_singular_values_from_log(args.log, args.n)
+	#sv = get_singular_values(args.s, args.n)
+	print "Matrix Norm: " + str(matrix_norm)
+	frob = getFrobeniusNorm(sv)
+	print "Frobenius from singular values: " + str(frob)
+	print "Coverage (F_s/F_m): " + str(frob/matrix_norm)
 
 def parse_arguments():
 	parser = argparse.ArgumentParser(description='')
@@ -23,34 +25,31 @@ def parse_arguments():
 
 	return parser.parse_args()
 
-# Get variance of the input matrix
-def getMatrixVariance(matrix):
-	variance = 0
-	for r in range(0, matrix.shape[0]):
-		for c in range(0, matrix.shape[1]):
-			variance += matrix[r][c]**2
-	return variance
-
 # Get variance of the first 'nranks' of the singular value array
-def getSingularVariance(s, nranks=None):
-	variance = 0
+def getFrobeniusNorm(s, nranks=None):
+	frobenius = 0
 
 	if not nranks:
 		nranks = len(s)
 
 	for i in range(0, nranks):
-		variance += s[i]**2
+		frobenius += s[i]**2
 
-	return variance
+	frobenius = math.sqrt(frobenius)
+
+	return frobenius
 
 # Input : same matrix file to GraphLab
-def frobenius(matrixfile):
+def getMatrixNorm(matrixfile):
 	frobenius = 0
 
 	with open(matrixfile) as f:
 		for _, line in enumerate(f): # 0 base for lineNum
 			_, _, val = line.strip().split('\t')
 			frobenius += float(val)**2
+
+	frobenius = math.sqrt(frobenius)
+
 	return frobenius
 
 
