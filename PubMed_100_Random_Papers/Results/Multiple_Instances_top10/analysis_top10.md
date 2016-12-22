@@ -11,6 +11,7 @@ This shows the result of 92 repeats of small matrices experiment. The purpose is
 
 ```r
 library(ggplot2)
+library(cowplot)
 library(plyr)
 library(dplyr)
 library(knitr) # kable()
@@ -87,11 +88,12 @@ The lines are the means of precisions from 92 different experiments for a given 
 
 
 ```r
+require(cowplot)
 create_curves <- function(data, graphTitle){
   ggplot(data, aes(x=nsv, y=precision, colour=distFunc)) + geom_point(alpha=0.1) + 
-  facet_grid(matrixType ~ .) + theme_bw() + ggtitle(graphTitle) + scale_x_continuous(expand = c(0, 0), breaks=seq(0, 1500, by=100)) +
+  facet_grid(matrixType ~ .) +  ggtitle(graphTitle) + scale_x_continuous(expand = c(0, 0), breaks=seq(0, 1500, by=100)) +
   labs(x="# singular values",y="Average precision") +
-  theme(plot.title = element_text(color="#666666", face="bold", size=16, hjust=0.2, vjust=1), legend.title=element_blank())+ 
+  theme(legend.title=element_blank())+ 
   stat_summary(fun.y = mean, geom="line", size=1.0) + scale_colour_brewer(palette="Set2")
 }
 create_curves(all_result, "Average precisions in retrieving related PubMed articles")
@@ -143,7 +145,7 @@ coverage <- dplyr::mutate(coverage, cov = frobenius/matrix_norm)
 # Graph
 create_curves <- function(data){
   ggplot(data, aes(x=nsv, y=cov, colour=matrixType)) + geom_point(alpha=0.1) +
-  theme_bw() + scale_x_continuous(expand = c(0, 0), breaks=seq(0, 1500, by=100)) + 
+  scale_x_continuous(expand = c(0, 0), breaks=seq(0, 1500, by=100)) + 
   labs(x="# singular values",y="Average coverage") + 
   theme(plot.title = element_text(color="#666666", face="bold", size=16, hjust=0.2, vjust=1),legend.title=element_blank()) + 
   stat_summary(fun.y = mean, geom="line", size=1.0)
@@ -163,14 +165,14 @@ sVals  <-  ddply(sVals, c("matrix_type", "rank"), summarise, avg_sval = mean(sin
 sVals$matrix_type <- factor(sVals$matrix_type, levels=c("term_freq", "term_binary", "tf_idf"), labels=c("Frequency", "Binary", "TF-IDF"))
 
 # Plot singular value by rank plot
-ggplot(data=sVals, aes(x = rank, y=avg_sval, colour=matrix_type)) + geom_point(alpha=0.3) + labs(x="Rank",y="Average singular value") + theme_bw() + theme(legend.title=element_blank()) 
+ggplot(data=sVals, aes(x = rank, y=avg_sval, colour=matrix_type)) + geom_point(alpha=0.3) + labs(x="Rank",y="Average singular value")  + theme(legend.title=element_blank()) 
 ```
 
 ![](analysis_top10_files/figure-html/singular_val_plots-1.png)<!-- -->
 
 ```r
 # Plot error by rank 
-ggplot(data=sVals, aes(x = rank, y=avg_error, colour=matrix_type)) + geom_point(alpha=0.3) + labs(x="Rank",y="Average error estimates") + theme_bw() + theme(legend.title=element_blank())
+ggplot(data=sVals, aes(x = rank, y=avg_error, colour=matrix_type)) + geom_point(alpha=0.3) + labs(x="Rank",y="Average error estimates")  + theme(legend.title=element_blank())
 ```
 
 ![](analysis_top10_files/figure-html/singular_val_plots-2.png)<!-- -->
@@ -185,7 +187,7 @@ Here we take the maxima precision across all number of singular values in each s
 ```r
 max_mean <- aggregate(precision ~ matrixType + ExperimentNum + distFunc, max, data=all_result)  # see maximum of all combinations 
 ggplot(max_mean, aes(x=distFunc, y=precision, fill=distFunc)) + geom_boxplot(show.legend = FALSE) + 
-  theme_bw() + facet_wrap(~matrixType) + labs(y="maximum precisions",x="distance function") + 
+  facet_wrap(~matrixType) + labs(y="maximum precisions",x="distance function") + 
   theme(legend.title = element_text(size=14), 
         legend.text = element_text(size=14),
         axis.text = element_text(size=12), 
@@ -226,7 +228,7 @@ Here we take the nsv at which maxima precision occcurs across all number of sing
 ```r
 maxima_nsv <- merge(max_mean, all_result[, c("precision", "nsv")], by="precision") # bring in the number of nsv 
 ggplot(maxima_nsv, aes(x=distFunc, y=nsv, fill=distFunc)) + geom_boxplot(show.legend = FALSE) + 
-  theme_bw() + facet_wrap(~matrixType) + labs(y="# singular values at maximum precision",x="distance function")+ 
+  facet_wrap(~matrixType) + labs(y="# singular values at maximum precision",x="distance function")+ 
   theme(legend.title = element_text(size=14), 
         legend.text = element_text(size=14),
         axis.text = element_text(size=12), 
@@ -261,7 +263,7 @@ This is to see how long the calculation takes. So it looks like using cosine fun
 
 ```r
 ggplot(all_result_means, aes(x=nsv, y=meanTime, colour=distFunc)) + geom_point() + facet_grid(matrixType ~ .) + 
-  theme_bw() + labs(x="number of singular values", y="average time")  + scale_colour_brewer(palette="Set2") + theme(legend.title=element_blank())
+  labs(x="number of singular values", y="average time")  + scale_colour_brewer(palette="Set2") + theme(legend.title=element_blank())
 ```
 
 ![](analysis_top10_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
