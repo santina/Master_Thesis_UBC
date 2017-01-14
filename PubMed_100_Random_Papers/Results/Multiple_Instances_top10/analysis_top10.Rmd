@@ -64,7 +64,7 @@ The lines are the means of precisions from 92 different experiments for a given 
 require(cowplot)
 create_curves <- function(data, graphTitle){
   ggplot(data, aes(x=nsv, y=precision, colour=distFunc)) + geom_point(alpha=0.1) + 
-  facet_grid(matrixType ~ .) +  ggtitle(graphTitle) + scale_x_continuous(expand = c(0, 0), breaks=seq(0, 1500, by=100)) +
+  facet_grid(matrixType ~ .) +  ggtitle(graphTitle) + scale_x_continuous(expand = c(0, 0), breaks=seq(0, 1500, by=200)) +
   labs(x="# singular values",y="Average precision") +
   theme(legend.title=element_blank())+ 
   stat_summary(fun.y = mean, geom="line", size=1.0) + scale_colour_brewer(palette="Set2")
