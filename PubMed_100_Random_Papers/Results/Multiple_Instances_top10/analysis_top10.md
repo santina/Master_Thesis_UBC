@@ -145,7 +145,7 @@ coverage <- dplyr::mutate(coverage, cov = frobenius/matrix_norm)
 # Graph
 create_curves <- function(data){
   ggplot(data, aes(x=nsv, y=cov, colour=matrixType)) + geom_point(alpha=0.1) +
-  scale_x_continuous(expand = c(0, 0), breaks=seq(0, 1500, by=100)) + 
+  scale_x_continuous(expand = c(0, 0), breaks=seq(0, 1500, by=200)) + 
   labs(x="# singular values",y="Average coverage") + 
   theme(plot.title = element_text(color="#666666", face="bold", size=16, hjust=0.2, vjust=1),legend.title=element_blank()) + 
   stat_summary(fun.y = mean, geom="line", size=1.0)
