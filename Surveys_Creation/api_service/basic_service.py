@@ -109,6 +109,15 @@ class ApiService(object):
             questions_ids.append(question["id"])
         return questions_ids
 
+    def get_survey_link(self, survey_id):
+        """ Get the link to the survey at which people can do the survey """
+        url = HOST + "/surveys/%s/collectors" %(survey_id)
+        payload = {
+            "type": "weblink"
+        }
+        response = self.make_post_request(url, payload)
+        return response["url"]
+
     def create_new_page(self, survey_id, title, description):
         """ Create a new page with title and description of the page,
         and return the page id """
@@ -154,11 +163,11 @@ class ApiService(object):
         return response
 
     def replace_single_choice_question(self, survey_id, page_id, question_id, title, choices):
-        url = "https://api.surveymonkey.net/v3/surveys/%s/pages/%s/questions/%s" % (survey_id, page_id, question_id)
+        url = HOST + "/surveys/%s/pages/%s/questions/%s" % (survey_id, page_id, question_id)
         question_data = questions.make_single_choice_question(title, choices)
         response = self.make_put_request(url, question_data)
 
     def replace_paragraph_text(self, survey_id, page_id, question_id, text):
-        url = "https://api.surveymonkey.net/v3/surveys/%s/pages/%s/questions/%s" % (survey_id, page_id, question_id)
+        url = HOST + "/surveys/%s/pages/%s/questions/%s" % (survey_id, page_id, question_id)
         text_data = questions.make_paragraph(text)
         response = self.make_put_request(url, text_data)
