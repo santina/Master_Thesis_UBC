@@ -15,7 +15,7 @@ def main():
     store_survey_link(client, survey_id, args.out)
 
     # NOTE: Each survey creation makes 32 API calls. Limited to 120 calls/minute
-    # and 500 calls/day. So you can only make maximum of 16 surveys a day. 
+    # and 500 calls/day. So you can only make maximum of 16 surveys a day.
 
 def parseArgs():
     """ Parse the argument and do sanity check """
@@ -70,7 +70,7 @@ def store_survey_link(client, survey_id, outfile):
     """ Get the survey link and store it in the file """
     survey_link = client.get_survey_link(survey_id)
     out = open(outfile, "w")
-    out.write(survey_link + '\n')
+    out.write(str(survey_id) + '\t' + survey_link + '\n')
 
 def get_surveys(client):
     return client.get_surveys()
