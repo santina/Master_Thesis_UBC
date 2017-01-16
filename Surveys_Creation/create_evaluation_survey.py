@@ -13,7 +13,7 @@ def main():
     # Make the survey and save the survey link
     survey_id = create_survey_from_questions(client, template_ID, args.name, args.f)
     store_choice_info(client, survey_id, args.choiceInfo)
-    store_survey_link(client, survey_id, args.linkInfo)
+    store_survey_link(client, survey_id, args.name, args.linkInfo)
 
     # NOTE: Each survey creation makes 32 API calls. Limited to 120 calls/minute
     # and 500 calls/day. So you can only make maximum of 16 surveys a day.
@@ -81,11 +81,11 @@ def store_choice_info(client, survey_id, outfile):
         out.write(choice_A_id + '\t' + choice_B_id + '\t' + choice_C_id + '\n')
     out.close()
 
-def store_survey_link(client, survey_id, outfile):
+def store_survey_link(client, survey_id, survey_name, outfile):
     """ Get the survey link and store it in the file """
     survey_link = client.get_survey_link(survey_id)
     out = open(outfile, "w")
-    out.write(str(survey_id) + '\t' + survey_link + '\n')
+    out.write(str(survey_id) + '\t' + survey_name + '\t' + survey_link + '\n')
     out.close()
 
 def get_surveys(client):
