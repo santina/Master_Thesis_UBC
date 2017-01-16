@@ -12,7 +12,8 @@ def main():
 
     # Make the survey and save the survey link
     survey_id = create_survey_from_questions(client, template_ID, args.name, args.f)
-    store_survey_link(client, survey_id, args.out)
+    store_choice_info(client, survey_id, args.choiceInfo)
+    store_survey_link(client, survey_id, args.linkInfo)
 
     # NOTE: Each survey creation makes 32 API calls. Limited to 120 calls/minute
     # and 500 calls/day. So you can only make maximum of 16 surveys a day.
@@ -22,7 +23,8 @@ def parseArgs():
     parser = argparse.ArgumentParser(description='Create a survey with a template' )
     parser.add_argument('--f', type=str, help='question file')
     parser.add_argument('--name', type=str, help='Name of the survey')
-    parser.add_argument('--link', type=str, help="File to store the survey link")
+    parser.add_argument('--linkInfo', type=str, help="File to store the survey link")
+    parser.add_argument('--choiceInfo', type=str, help="File to store the choice IDs so we know which IDs refer to which choice (A or B)")
     args = parser.parse_args()
 
     return args
@@ -66,11 +68,25 @@ def change_AB_abstracts(client, question, survey_id, page_id):
 def make_abstract_paragraph(question, abstract_type):
     return "TITLE: %s \n ABSTRACT: %s " %(question[abstract_type]["title"], question[abstract_type]["abstract"])
 
+def store_choice_info(client, survey_id, outfile):
+    survey_detail = client.get_survey_details(survey_id)
+    survey_detail = survey_detail["pages"]
+
+    out = open(outfile, "w")
+    for page in survey_detail[1:]:
+        question = page["questions"][0]["answers"]["choices"]
+        choice_A_id = question[0]["id"]
+        choice_B_id = question[1]["id"]
+        choice_C_id = question[2]["id"]
+        out.write(choice_A_id + '\t' + choice_B_id + '\t' + choice_C_id + '\n')
+    out.close()
+
 def store_survey_link(client, survey_id, outfile):
     """ Get the survey link and store it in the file """
     survey_link = client.get_survey_link(survey_id)
     out = open(outfile, "w")
     out.write(str(survey_id) + '\t' + survey_link + '\n')
+    out.close()
 
 def get_surveys(client):
     return client.get_surveys()

@@ -118,6 +118,11 @@ class ApiService(object):
         response = self.make_post_request(url, payload)
         return response["url"]
 
+    def get_survey_details(self, survey_id):
+        url  = HOST + "/surveys/%s/details" % (survey_id)
+        responses = self.make_get_request(url)
+        return responses
+
     def create_new_page(self, survey_id, title, description):
         """ Create a new page with title and description of the page,
         and return the page id """
