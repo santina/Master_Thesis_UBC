@@ -44,10 +44,11 @@ def make_survey_data(rank_file, outfile):
             if data:
                 # write to outfile
                 out.write(str(data) + '\n')
+                time.sleep(0.4) # making sure we are making less than 3 requests per second
 
 def get_pubmed_rank1(split_line):
     top10 = eval(split_line[-1])
-    top10 = sorted(top10, key=lambda x: x[1])  # sort by the pubmed rank
+    top10 = sorted(top10, key=lambda x: x[0])  # sort by the pubmed rank
     return str(top10[0][2])
 
 def request_data(target_pmid, pubmed_pmid, svd_pmid):
@@ -81,7 +82,7 @@ def create_data(target_pmid, pubmed_pmid, svd_pmid, papers):
         "pubmed" : create_subdata(pubmed_pmid, papers[1], pubmed_choice),
         "svd" : create_subdata(svd_pmid, papers[2], svd_choice),
     }
-    
+
     return data
 
 def create_subdata(pmid, paper, choice):
