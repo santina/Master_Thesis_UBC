@@ -10,6 +10,7 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(ggplot2)
+library(cowplot)
 ```
 
 ## Data 
@@ -26,7 +27,7 @@ head(singular_value)
 
 First let's plot the error 
 ```{r error_estimates}
-ggplot(singular_value, aes(x = rank, y = error_estimate)) + geom_point(size=1, alpha=0.6) + ylab("Error estimate") + xlab("Rank") + theme_bw()
+ggplot(singular_value, aes(x = rank, y = error_estimate)) + geom_point(size=1, alpha=0.6) + ylab("Error estimate") + xlab("Rank") 
 ```
 
 ```{r available_nsv}
@@ -40,7 +41,7 @@ singular_value$error_estimate[nsv+1]
 
 Plotting the singular value
 ```{r singular_value_plot}
-ggplot(singular_value, aes(x = rank, y = singular_value)) + geom_point(size=1, alpha=0.6) + ylab("Singular value") + xlab("Rank") + theme_bw()
+ggplot(singular_value, aes(x = rank, y = singular_value)) + geom_point(size=1, alpha=0.6) + ylab("Singular value") + xlab("Rank") 
 ```
 
 As expected in this sanity check, it's a downward curve that drops in tangential slope sharply after the first few singular value. 

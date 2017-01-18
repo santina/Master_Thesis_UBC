@@ -30,7 +30,7 @@ head(singular_value)
 First let's plot the error 
 
 ```r
-ggplot(singular_value, aes(x = rank, y = error_estimate)) + geom_point(size=1, alpha=0.6) + ylab("Error estimate") + xlab("Rank") + theme_bw()
+ggplot(singular_value, aes(x = rank, y = error_estimate)) + geom_point(size=1, alpha=0.6) + ylab("Error estimate") + xlab("Rank") 
 ```
 
 ![](big_matrix_sampling_tf_files/figure-html/error_estimates-1.png)<!-- -->
@@ -66,7 +66,7 @@ singular_value$error_estimate[nsv+1]
 Plotting the singular value
 
 ```r
-ggplot(singular_value, aes(x = rank, y = singular_value)) + geom_point(size=1, alpha=0.6) + ylab("Singular value") + xlab("Rank") + theme_bw()
+ggplot(singular_value, aes(x = rank, y = singular_value)) + geom_point(size=1, alpha=0.6) + ylab("Singular value") + xlab("Rank") 
 ```
 
 ![](big_matrix_sampling_tf_files/figure-html/singular_value_plot-1.png)<!-- -->
