@@ -18,6 +18,7 @@ This is for examinig the data to prepare for SVD on the big 13-million-abstract 
 
 ```{r library, message=FALSE}
 library(ggplot2)
+library(cowplot)
 library(plyr) # note to self: load this before dplyr always. 
 library(dplyr)
 ```
@@ -34,7 +35,7 @@ head(singular_value)
 
 First let's plot the error 
 ```{r error_estimates}
-ggplot(singular_value, aes(x = rank, y = error_estimate)) + geom_point(size=1, alpha=0.5) + ylab("Error estimate") + xlab("Rank") + theme_bw() 
+ggplot(singular_value, aes(x = rank, y = error_estimate)) + geom_point(size=1, alpha=0.5) + ylab("Error estimate") + xlab("Rank")
 ```
 It's clear that after some nsv, the error jumps up significantly, so we do not want to use those singular values. Let's find the number of singular values that have less than 0.5 error rate 
 
@@ -47,7 +48,7 @@ nsv
 
 Plotting the singular value
 ```{r singular_value_plot}
-ggplot(singular_value, aes(x = rank, y = singular_value)) + geom_point(size=1) + ylab("Singular value") + xlab("Rank") + theme_bw() 
+ggplot(singular_value, aes(x = rank, y = singular_value)) + geom_point(size=1) + ylab("Singular value") + xlab("Rank") 
 ```
 
 As expected in this sanity check, it's a downward curve that drops in tangential slope sharply after the first few singular value. 
@@ -77,7 +78,7 @@ nsv
 
 ### singular values 
 ```{r singular_value_plot_fullmatrix}
-ggplot(singularval_fullmatrix, aes(x = rank, y = singular_value)) + geom_point(size=1) + ylab("Singular value") + xlab("Rank") + theme_bw() 
+ggplot(singularval_fullmatrix, aes(x = rank, y = singular_value)) + geom_point(size=1) + ylab("Singular value") + xlab("Rank")
 ```
 
 The number of singular values measured to be useable are `r nsv`.
@@ -90,7 +91,7 @@ The number of singular values measured to be useable are `r nsv`.
 singular_value$matrix <- factor("sampled matrix")
 singularval_fullmatrix$matrix <- factor("full matrix")
 svals <- rbind(singularval_fullmatrix, singular_value)
-ggplot(svals, aes(x = rank, y = singular_value, colour=matrix)) + geom_point(size=1) + ylab("Singular value") + xlab("Rank") + theme_bw() + theme(legend.title=element_blank())
+ggplot(svals, aes(x = rank, y = singular_value, colour=matrix)) + geom_point(size=1) + ylab("Singular value") + xlab("Rank") + theme(legend.title=element_blank())
 ```
 
 Due to some quirks in GraphLab, to accurate estimate the first 1000 nsv, we would need to give some room for convergence. Because of the high error estimates after 500 singular values in the full matrix, which was made by telling graphlab to estimate 1100 nsv, I'd need to redo the SVD on the full matrix by doing nsv=2000 if I want to estimate the first 1000 more accurately, just like what I did with the sampled matrix. 
@@ -112,7 +113,7 @@ sampled_100X_0.01_2000nsv_cov$matrix <- factor("sampled matrix")
 full_matrix_1000nsv_cov$matrix  <- factor("full matrix")
 coverage <- rbind(sampled_100X_0.01_2000nsv_cov, full_matrix_1000nsv_cov)
 
-ggplot(coverage, aes(x = nsv, y = coverage, colour=matrix)) + geom_point(size=1) + ylab("coverage") + xlab("# singular values") + theme_bw() + theme(legend.title=element_blank())
+ggplot(coverage, aes(x = nsv, y = coverage, colour=matrix)) + geom_point(size=1) + ylab("coverage") + xlab("# singular values") + theme(legend.title=element_blank())
 
 ```
 
@@ -128,7 +129,7 @@ I repeated the previous step on the full matrix but this time with more singular
 
 ```{r}
 svals_full <- read.table("sVals_full_matrix_2000.summary", header=TRUE)
-ggplot(svals_full, aes(x = rank, y = error_estimate)) + geom_point(size=1, alpha=0.5) + ylab("Error estimate") + xlab("Rank") + theme_bw()
+ggplot(svals_full, aes(x = rank, y = error_estimate)) + geom_point(size=1, alpha=0.5) + ylab("Error estimate") + xlab("Rank") 
 nsv <- sum(svals_full$error_estimate < 0.5)
 nsv
 ```
@@ -136,7 +137,7 @@ nsv
 ## singular values 
 
 ```{r}
-ggplot(svals_full, aes(x = rank, y = singular_value)) + geom_point(size=1) + ylab("Singular value") + xlab("Rank") + theme_bw()
+ggplot(svals_full, aes(x = rank, y = singular_value)) + geom_point(size=1) + ylab("Singular value") + xlab("Rank") 
 ```
 
 ## comparison with sampled matrix 
@@ -145,19 +146,19 @@ Singular values
 ```{r}
 svals_full$matrix <- factor("full matrix")
 svals <- rbind(svals_full, singular_value)
-ggplot(svals, aes(x = rank, y = singular_value, colour=matrix)) + geom_point(size=1) + ylab("Singular value") + xlab("Rank") + theme_bw() + theme(legend.title=element_blank())
+ggplot(svals, aes(x = rank, y = singular_value, colour=matrix)) + geom_point(size=1) + ylab("Singular value") + xlab("Rank") + theme(legend.title=element_blank())
 ```
 
 Error estimates
 ```{r}
-ggplot(svals, aes(x = rank, y = error_estimate, colour=matrix)) + geom_point(size=1, alpha=0.5) + ylab("Error estimate") + xlab("Rank") + theme_bw() + theme(legend.title=element_blank())
+ggplot(svals, aes(x = rank, y = error_estimate, colour=matrix)) + geom_point(size=1, alpha=0.5) + ylab("Error estimate") + xlab("Rank") + theme(legend.title=element_blank())
 ```
 
 Coverage
 ```{r}
 full_matrix_2000nsv_cov <- read.table("nsv_coverage_full_matrix_tfidf2000.result", header=TRUE)
 full_matrix_2000nsv_cov$matrix  <- factor("full matrix")
-coverage <- rbind(sampled_100X_0.01_2000nsv_cov, full_matrix_2000nsv_cov)
+coverage <- rbind(full_matrix_2000nsv_cov, sampled_100X_0.01_2000nsv_cov)
 
-ggplot(coverage, aes(x = nsv, y = coverage, colour=matrix)) + geom_point(size=1) + ylab("coverage") + xlab("# singular values") + theme_bw() + theme(legend.title=element_blank())
+ggplot(coverage, aes(x = nsv, y = coverage, colour=matrix)) + geom_point(size=1) + ylab("coverage") + xlab("# singular values")  + theme(legend.title=element_blank())
 ```
