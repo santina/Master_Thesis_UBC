@@ -14,7 +14,6 @@ Setting up the required packages and import the data
 
 ```r
 library(ggplot2)
-library(cowplot)
 library(plyr) # note to self: load this before dplyr always. 
 library(dplyr)
 library(magrittr)
@@ -83,10 +82,10 @@ tf_summary <- all[all$type=="tf", ] %>% dplyr::group_by(id, rate, nsv) %>% dplyr
 Excluding id 93 to make the facet-wrap 3 by 3. Don't worry, it's not an outlier. 
 
 ```r
-tf_summary <- tf_summary[tf_summary$id != "93",]
-tfidf_summary <- tfidf_summary[tfidf_summary$id != "93",]
+#tf_summary <- tf_summary[tf_summary$id != "93",]
+#tfidf_summary <- tfidf_summary[tfidf_summary$id != "93",]
 # Plot the one for tf 
-ggplot(tf_summary, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() + facet_wrap(~id) + ylab("coverage") + xlab("sampling rate")
+ggplot(tf_summary, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() + facet_wrap(~id, nrow=2, scales="fixed", shrink=FALSE) + ylab("coverage") + xlab("sampling rate") + theme_bw()
 ```
 
 ![](matrix_sampling_files/figure-html/tf_coverage-1.png)<!-- -->
@@ -96,7 +95,7 @@ From this plot we can see that lower sampling rate result in smaller coverage, w
 
 ```r
 # Plot tfidf 
-ggplot(tfidf_summary, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() + facet_wrap(~id) + ylab("coverage") + xlab("sampling rate")
+ggplot(tfidf_summary, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() + facet_wrap(~id, nrow=2) + ylab("coverage") + xlab("sampling rate")  + theme_bw()
 ```
 
 ![](matrix_sampling_files/figure-html/tf_tfidf_coverage-1.png)<!-- -->
@@ -121,7 +120,7 @@ svals_tf <- svals_tf %>% tidyr::separate(matrix_name, c("id", "sampled", "type")
 svals_tf$rate <- factor(svals_tf$rate)
 
 # Graph
-ggplot(svals_tf, aes(x=rank, y=error_estimate_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + theme(axis.text.x = element_text(size = 9))  + ylab("means of error estimates")
+ggplot(svals_tf, aes(x=rank, y=error_estimate_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id, nrow=2, scale="free") + scale_color_brewer(palette="Spectral") + theme(axis.text.x = element_text(size = 9))  + ylab("means of error estimates") + theme_bw() + scale_x_continuous(breaks = seq(0, 1000, 500))
 ```
 
 ![](matrix_sampling_files/figure-html/erorr_estimate-1.png)<!-- -->
@@ -138,7 +137,7 @@ A look at the singular values
 
 
 ```r
-ggplot(svals_tf, aes(x=rank, y=singular_value_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + ylab("singular value") + theme(axis.text.x = element_text(size = 9))  
+ggplot(svals_tf, aes(x=rank, y=singular_value_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id, nrow=2) + scale_color_brewer(palette="Spectral") + ylab("singular value") + theme(axis.text.x = element_text(size = 9)) + theme_bw()
 ```
 
 ![](matrix_sampling_files/figure-html/mean_svals-1.png)<!-- -->
@@ -179,7 +178,7 @@ Graph result
 
 
 ```r
-ggplot(run_time_summary, aes(x = sample_rate, y = mean)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name) + ylab("average run time (seconds)") + xlab("sampling rate")
+ggplot(run_time_summary, aes(x = sample_rate, y = mean)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name, nrow=2, scale="free") + ylab("average run time (seconds)") + xlab("sampling rate") + theme_bw()
 ```
 
 ![](matrix_sampling_files/figure-html/runningtime_tfidf_summary-1.png)<!-- -->
@@ -187,7 +186,7 @@ ggplot(run_time_summary, aes(x = sample_rate, y = mean)) + geom_point() + geom_l
 Make 3 by 3 
 
 ```r
-ggplot(run_time_summary[run_time_summary$matrix_name!="98", ], aes(x = sample_rate, y = mean)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name) + ylab("average run time (seconds)") + xlab("sampling rate")
+ggplot(run_time_summary[run_time_summary$matrix_name!="98", ], aes(x = sample_rate, y = mean)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name, ncol=2) + ylab("average run time (seconds)") + xlab("sampling rate")
 ```
 
 ![](matrix_sampling_files/figure-html/runningtime_tfidf_3by3-1.png)<!-- -->
@@ -236,7 +235,7 @@ Graph result
 
 
 ```r
-ggplot(sparsity_summary, aes(x = sample_rate, y = mean)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name) + ylab("average sparsity") + xlab("sampling rate")
+ggplot(sparsity_summary, aes(x = sample_rate, y = mean)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name, nrow=2) + ylab("average sparsity") + xlab("sampling rate") + theme_bw()
 ```
 
 ![](matrix_sampling_files/figure-html/sparsity_tfidf_summary-1.png)<!-- -->
