@@ -57,10 +57,7 @@ str(tfidf_original)
     ##  $ variance        : num  384694 544726 661040 753233 371051 ...
     ##  $ nsv             : int  200 400 600 800 200 400 600 800 200 400 ...
 
-Fixing my original calculation
-------------------------------
-
-On Dec 20, I found that I forgot to take the square root of my frobenius norm and variance (sum of squares). Therefore, I'm doing it now to fix it with in the dataset itself to avoid having to rerun the command.
+**Fixing my original calculation** On Dec 20, I found that I forgot to take the square root of my frobenius norm and variance (sum of squares). Therefore, I'm doing it now to fix it with in the dataset itself to avoid having to rerun the command.
 
 ``` r
 tfidf <- transform(tfidf, forbenius=sqrt(forbenius), variance=sqrt(variance))
@@ -118,30 +115,30 @@ Scalar = 10
 # Create different data.frame for different scalar group (including the sample = 1 group)
 all_10 <- rbind(tfidf_original, tfidf[tfidf$scalar==10,])
 all_10 <- get_summary(all_10)
-ggplot(all_10, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name, nrow=2) + theme_bw()
+ggplot(all_10, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name, nrow=2) + theme_bw() + theme(text = element_text(size=8))
 ```
 
-![](matrix_sampling_TFIDF_files/figure-markdown_github/tfidf_coverage_scalar10-1.png)
+<img src="matrix_sampling_TFIDF_files/figure-markdown_github/tfidf_coverage_scalar10-1.png" width="800" />
 
 Scalar = 100
 
 ``` r
 all_100 <- rbind(tfidf_original, tfidf[tfidf$scalar==100,])
 all_100 <- get_summary(all_100)
-ggplot(all_100, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name, nrow=2) + theme_bw() 
+ggplot(all_100, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name, nrow=2) + theme_bw() + theme(text = element_text(size=8))
 ```
 
-![](matrix_sampling_TFIDF_files/figure-markdown_github/tfidf_coverage_scalar100-1.png)
+<img src="matrix_sampling_TFIDF_files/figure-markdown_github/tfidf_coverage_scalar100-1.png" width="800" />
 
 Scalar = 1000
 
 ``` r
 all_1000 <- rbind(tfidf_original, tfidf[tfidf$scalar==1000,])
 all_1000 <- get_summary(all_1000)
-ggplot(all_1000, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name, nrow=2) + theme_bw() 
+ggplot(all_1000, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name, nrow=2) + theme_bw() + theme(text = element_text(size=8))
 ```
 
-![](matrix_sampling_TFIDF_files/figure-markdown_github/tfidf_coverage_scalar1000-1.png)
+<img src="matrix_sampling_TFIDF_files/figure-markdown_github/tfidf_coverage_scalar1000-1.png" width="800" />
 
 Look at error estimates and singular values
 -------------------------------------------
@@ -150,7 +147,7 @@ Look at error estimates and singular values
 # Data process. Loading from my own project space because I don't want to commit the result file. 
 svals_tfidf <- read.table("/projects/slin_prj/PubMed_Experiment/graph_sparsification/svals_sampled_tfidf.result", header=TRUE)
 svals_tfidf <- svals_tfidf %>% dplyr::group_by(matrix_name, rate, multiplier, rank) %>% dplyr::summarise_at(c("singular_value", "error_estimate"), c("mean", "sd"))
-svals_tfidf <- svals_tfidf %>% tidyr::separate(matrix_name, c("id"), sep = "[.]") # simplify matrix name 
+svals_tfidf <- svals_tfidf %>% tidyr::separate(matrix_name, c("id", "matrix_type"), sep = "[.]") # simplify matrix name 
 svals_tfidf$rate <- factor(svals_tfidf$rate)
 ```
 
@@ -158,17 +155,15 @@ For multiplier = 10
 
 ``` r
 # Excluding 93 to see the others better. 
-ggplot(svals_tfidf[c(svals_tfidf$id != "93", svals_tfidf$multiplier==10), ], aes(x=rank, y=error_estimate_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + ylab("singular values") + theme_bw()
+ggplot(svals_tfidf[svals_tfidf$multiplier==10, ], aes(x=rank, y=error_estimate_mean, colour=rate)) + geom_point(alpha=0.3, size=0.5) + facet_wrap(~id, nrow=2) +  ylab("singular values") + theme_bw() + guides(colour = guide_legend(override.aes = list(size=5))) + scale_colour_brewer(palette = "Set1")
 ```
-
-    ## Warning: Removed 49901 rows containing missing values (geom_point).
 
 ![](matrix_sampling_TFIDF_files/figure-markdown_github/multiplier_10-1.png) From the look of it, the error estimate are similar for matrices sampled at different rate. Powergraph's error of singular value estimates are similar for the same matrix sampled at different rate.
 
 A look at the singular values
 
 ``` r
-ggplot(svals_tfidf, aes(x=rank, y=singular_value_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id, nrow=2) + scale_color_brewer(palette="Spectral") + ylab("singular value") + theme_bw()
+ggplot(svals_tfidf, aes(x=rank, y=singular_value_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id, nrow=2) + ylab("singular value") + theme_bw() + guides(colour = guide_legend(override.aes = list(size=5))) + scale_colour_brewer(palette = "Set1")
 ```
 
 ![](matrix_sampling_TFIDF_files/figure-markdown_github/mean_svals-1.png)
@@ -227,7 +222,7 @@ head(run_time_summary)
 Graph result
 
 ``` r
-ggplot(run_time_summary, aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name, nrow=2) + theme_bw()
+ggplot(run_time_summary, aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name, nrow=2, scale="free") + theme_bw()
 ```
 
 ![](matrix_sampling_TFIDF_files/figure-markdown_github/runningtime_tfidf_summary-1.png)
@@ -240,6 +235,14 @@ ggplot(run_time_summary_subset, aes(x = sample_rate, y = mean, colour = scalar, 
 ```
 
 ![](matrix_sampling_TFIDF_files/figure-markdown_github/runningtime_tfidf_no_outliers-1.png)
+
+Overall running time
+
+``` r
+ggplot(run_time_summary, aes(x = sample_rate, y = mean, color=scalar)) + geom_point() + stat_summary(fun.y = mean, geom="line", size=1.0) + ylab("average run time (seconds)") + xlab("sampling rate") + theme_bw()
+```
+
+![](matrix_sampling_TFIDF_files/figure-markdown_github/runningtime_tfidf_all_matrices-1.png)
 
 Sparsity
 --------

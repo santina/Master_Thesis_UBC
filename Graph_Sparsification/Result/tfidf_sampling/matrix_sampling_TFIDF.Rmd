@@ -34,7 +34,7 @@ str(tfidf)
 str(tfidf_original)
 ```
 
-## Fixing my original calculation 
+**Fixing my original calculation** 
 On Dec 20, I found that I forgot to take the square root of my frobenius norm and variance (sum of squares). Therefore, I'm doing it now to fix it with in the dataset itself to avoid having to rerun the command. 
 
 ```{r}
@@ -82,25 +82,25 @@ ggplot(tfidf_summary, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_
 ## See the difference in scalar
 
 Scalar = 10
-```{r tfidf_coverage_scalar10}
+```{r tfidf_coverage_scalar10, out.width='800', dpi=200}
 # Create different data.frame for different scalar group (including the sample = 1 group)
 all_10 <- rbind(tfidf_original, tfidf[tfidf$scalar==10,])
 all_10 <- get_summary(all_10)
-ggplot(all_10, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name, nrow=2) + theme_bw()
+ggplot(all_10, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name, nrow=2) + theme_bw() + theme(text = element_text(size=8))
 ``` 
 
 Scalar = 100
-```{r tfidf_coverage_scalar100}
+```{r tfidf_coverage_scalar100, out.width='800', dpi=200}
 all_100 <- rbind(tfidf_original, tfidf[tfidf$scalar==100,])
 all_100 <- get_summary(all_100)
-ggplot(all_100, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name, nrow=2) + theme_bw() 
+ggplot(all_100, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name, nrow=2) + theme_bw() + theme(text = element_text(size=8))
 ```
 
 Scalar = 1000
-```{r tfidf_coverage_scalar1000}
+```{r tfidf_coverage_scalar1000, out.width='800', dpi=200}
 all_1000 <- rbind(tfidf_original, tfidf[tfidf$scalar==1000,])
 all_1000 <- get_summary(all_1000)
-ggplot(all_1000, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name, nrow=2) + theme_bw() 
+ggplot(all_1000, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name, nrow=2) + theme_bw() + theme(text = element_text(size=8))
 ```
 
 ## Look at error estimates and singular values
@@ -108,22 +108,21 @@ ggplot(all_1000, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point
 # Data process. Loading from my own project space because I don't want to commit the result file. 
 svals_tfidf <- read.table("/projects/slin_prj/PubMed_Experiment/graph_sparsification/svals_sampled_tfidf.result", header=TRUE)
 svals_tfidf <- svals_tfidf %>% dplyr::group_by(matrix_name, rate, multiplier, rank) %>% dplyr::summarise_at(c("singular_value", "error_estimate"), c("mean", "sd"))
-svals_tfidf <- svals_tfidf %>% tidyr::separate(matrix_name, c("id"), sep = "[.]") # simplify matrix name 
+svals_tfidf <- svals_tfidf %>% tidyr::separate(matrix_name, c("id", "matrix_type"), sep = "[.]") # simplify matrix name 
 svals_tfidf$rate <- factor(svals_tfidf$rate)
 ```
 
 For multiplier = 10 
 ```{r multiplier_10}
-
 # Excluding 93 to see the others better. 
-ggplot(svals_tfidf[c(svals_tfidf$id != "93", svals_tfidf$multiplier==10), ], aes(x=rank, y=error_estimate_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + ylab("singular values") + theme_bw()
+ggplot(svals_tfidf[svals_tfidf$multiplier==10, ], aes(x=rank, y=error_estimate_mean, colour=rate)) + geom_point(alpha=0.3, size=0.5) + facet_wrap(~id, nrow=2) +  ylab("singular values") + theme_bw() + guides(colour = guide_legend(override.aes = list(size=5))) + scale_colour_brewer(palette = "Set1")
 ```
 From the look of it, the error estimate are similar for matrices sampled at different rate. Powergraph's error of singular value estimates are similar for the same matrix sampled at different rate. 
 
 A look at the singular values 
 
 ```{r mean_svals, warning=FALSE}
-ggplot(svals_tfidf, aes(x=rank, y=singular_value_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id, nrow=2) + scale_color_brewer(palette="Spectral") + ylab("singular value") + theme_bw()
+ggplot(svals_tfidf, aes(x=rank, y=singular_value_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id, nrow=2) + ylab("singular value") + theme_bw() + guides(colour = guide_legend(override.aes = list(size=5))) + scale_colour_brewer(palette = "Set1")
 
 # Exclude 93 for 3 by 3 
 ggplot(svals_tfidf[svals_tfidf$id != "93", ], aes(x=rank, y=singular_value_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + ylab("singular value") + theme_bw()
@@ -153,13 +152,18 @@ head(run_time_summary)
 Graph result 
 
 ```{r runningtime_tfidf_summary}
-ggplot(run_time_summary, aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name, nrow=2) + theme_bw()
+ggplot(run_time_summary, aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name, nrow=2, scale="free") + theme_bw()
 ```
 
 Remove 90, 91, and 92 to show the data better. 
 ```{r runningtime_tfidf_no_outliers}
 run_time_summary_subset <- subset(run_time_summary, !matrix_name %in% c("90", "91", "92"))
 ggplot(run_time_summary_subset, aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name) + theme_bw()
+```
+
+Overall running time 
+```{r runningtime_tfidf_all_matrices}
+ggplot(run_time_summary, aes(x = sample_rate, y = mean, color=scalar)) + geom_point() + stat_summary(fun.y = mean, geom="line", size=1.0) + ylab("average run time (seconds)") + xlab("sampling rate") + theme_bw()
 ```
 
 
