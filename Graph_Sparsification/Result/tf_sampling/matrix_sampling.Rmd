@@ -1,8 +1,7 @@
 ---
 title: "Matrix sampling"
 output: 
-  html_document:
-    keep_md: yes
+  html_document: github_document
 ---
 
 ```{r setup, include=FALSE}
@@ -31,6 +30,16 @@ tf <- read.table("termfreq.summary", header=TRUE)
 tf_original <- read.table("tf_original.summary", header = TRUE) 
 tfidf <- read.table("tfidf.summary", header=TRUE)
 tfidf_original <- read.table("tfidf_original.summary", header=TRUE)
+```
+
+**Fixing my original calculation** 
+On Dec 20, I found that I forgot to take the square root of my frobenius norm and variance (sum of squares). Therefore, I'm doing it now to fix it with in the dataset itself to avoid having to rerun the command. 
+
+```{r}
+tf <- transform(tf, forbenius=sqrt(forbenius), variance=sqrt(variance))
+tf_original <- transform(tf_original, forbenius=sqrt(forbenius), variance=sqrt(variance))
+tfidf <- transform(tfidf, forbenius=sqrt(forbenius), variance=sqrt(variance))
+tfidf_original <- transform(tfidf_original, forbenius=sqrt(forbenius), variance=sqrt(variance))
 ```
 
 ## Clean up the data a bit
@@ -193,13 +202,13 @@ sparsity_summary <- get_summary(sparsity)
 
 Graph result 
 
-```{r sparsity_tfidf_summary}
-ggplot(sparsity_summary, aes(x = sample_rate, y = mean)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name, nrow=2) + ylab("average sparsity") + xlab("sampling rate") + theme_bw()
+```{r sparsity_tf_summary}
+ggplot(sparsity_summary, aes(x = sample_rate, y = mean)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name, nrow=2) + ylab("Average number of entries") + xlab("sampling rate") + theme_bw()
 ```
 
 Make 3 by 3 
-```{r sparsity_tfidf_3by3}
-ggplot(sparsity_summary[sparsity_summary$matrix_name!="9", ], aes(x = sample_rate, y = mean)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name) + ylab("average sparsity") + xlab("sampling rate")
+```{r sparsity_tf_3by3}
+ggplot(sparsity_summary[sparsity_summary$matrix_name!="9", ], aes(x = sample_rate, y = mean)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name) + ylab("Average number of entries") + xlab("sampling rate")
 ```
 
 Sampling is fairly consistent at producing matrices with the same sparsity. 
