@@ -2,9 +2,7 @@
 title: 'Matrix sampling for TFIDF'
 author: "Santina Lin"
 date: "November 9, 2016"
-output: 
-  html_document:
-    keep_md: yes
+output: github_document
 ---
 
 ## Overview 
@@ -34,6 +32,14 @@ Inspect data
 ```{r}
 str(tfidf)
 str(tfidf_original)
+```
+
+## Fixing my original calculation 
+On Dec 20, I found that I forgot to take the square root of my frobenius norm and variance (sum of squares). Therefore, I'm doing it now to fix it with in the dataset itself to avoid having to rerun the command. 
+
+```{r}
+tfidf <- transform(tfidf, forbenius=sqrt(forbenius), variance=sqrt(variance))
+tfidf_original <- transform(tfidf_original, forbenius=sqrt(forbenius), variance=sqrt(variance))
 ```
 
 Cleaning up the data to extract out information in the names
@@ -75,33 +81,26 @@ ggplot(tfidf_summary, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_
 
 ## See the difference in scalar
 
-First let me remove matrix 9 so that the facet_wrap can be 3 by 3. 
-```{r}
-tfidf_original <- tfidf_original[tfidf_original$matrix_name != "9",]
-tfidf <- tfidf[tfidf$matrix_name != "9",]
-```
-
-
 Scalar = 10
 ```{r tfidf_coverage_scalar10}
 # Create different data.frame for different scalar group (including the sample = 1 group)
 all_10 <- rbind(tfidf_original, tfidf[tfidf$scalar==10,])
 all_10 <- get_summary(all_10)
-ggplot(all_10, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name) + theme_bw()
+ggplot(all_10, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name, nrow=2) + theme_bw()
 ``` 
 
 Scalar = 100
 ```{r tfidf_coverage_scalar100}
 all_100 <- rbind(tfidf_original, tfidf[tfidf$scalar==100,])
 all_100 <- get_summary(all_100)
-ggplot(all_100, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name) + theme_bw()
+ggplot(all_100, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name, nrow=2) + theme_bw() 
 ```
 
 Scalar = 1000
 ```{r tfidf_coverage_scalar1000}
 all_1000 <- rbind(tfidf_original, tfidf[tfidf$scalar==1000,])
 all_1000 <- get_summary(all_1000)
-ggplot(all_1000, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name) + theme_bw()
+ggplot(all_1000, aes(x = rate, y = cov, colour = nsv, group = nsv)) + geom_point() + geom_line() +  facet_wrap(~matrix_name, nrow=2) + theme_bw() 
 ```
 
 ## Look at error estimates and singular values
@@ -124,7 +123,7 @@ From the look of it, the error estimate are similar for matrices sampled at diff
 A look at the singular values 
 
 ```{r mean_svals, warning=FALSE}
-ggplot(svals_tfidf, aes(x=rank, y=singular_value_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + ylab("singular value") + theme_bw()
+ggplot(svals_tfidf, aes(x=rank, y=singular_value_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id, nrow=2) + scale_color_brewer(palette="Spectral") + ylab("singular value") + theme_bw()
 
 # Exclude 93 for 3 by 3 
 ggplot(svals_tfidf[svals_tfidf$id != "93", ], aes(x=rank, y=singular_value_mean, colour=rate)) + geom_point(alpha=0.5, size=0.5) + facet_wrap(~id) + scale_color_brewer(palette="Spectral") + ylab("singular value") + theme_bw()
@@ -148,14 +147,13 @@ get_summary <- function(data) {
 }
 
 run_time_summary <- get_summary(run_time)
-str(run_time_summary)
 head(run_time_summary)
 ```
 
 Graph result 
 
 ```{r runningtime_tfidf_summary}
-ggplot(run_time_summary, aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name) + theme_bw()
+ggplot(run_time_summary, aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name, nrow=2) + theme_bw()
 ```
 
 Remove 90, 91, and 92 to show the data better. 
@@ -183,14 +181,13 @@ get_summary <- function(data) {
 }
 
 sparsity_summary <- get_summary(sparsity)
-str(sparsity_summary)
 head(sparsity_summary)
 ```
 
 Graph result 
 
 ```{r sparsity_tfidf_summary}
-ggplot(sparsity_summary, aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name) + theme_bw()
+ggplot(sparsity_summary, aes(x = sample_rate, y = mean, colour = scalar, group = scalar)) + geom_point() + geom_line() + geom_errorbar(aes(ymax = mean + de, ymin=mean - de), width=0.01) +  facet_wrap(~matrix_name, nrow=2) + theme_bw()
 ```
 
 Make 3 by 3 
