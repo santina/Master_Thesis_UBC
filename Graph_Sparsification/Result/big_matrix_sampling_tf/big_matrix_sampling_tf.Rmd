@@ -18,34 +18,57 @@ The tf matrix was sampled at 0.1 rate and was SVD with nsv=2000.
 
 We'll look at the log file of the GraphLab output from running collaborative filtering on this matrix. 
 ```{r}
-singular_value <- read.table("sval_tf_r0.1_nsv2000.summary", header=TRUE)
-head(singular_value)
+svals_sampled <- read.table("svals_tf_sampled_0.1_nsv2000.txt", header=TRUE)
+svals_full <- read.table("svals_tf_nsv2000.txt", header=TRUE)
+head(svals_sampled)
 ``` 
+
+Combine the two data set together 
+```{r}
+svals_full$matrix <- factor("full matrix")
+svals_sampled$matrix <- factor("sampled matrix")
+all <- rbind(svals_full, svals_sampled)
+
+```
 
 ### Error estimates 
 
 First let's plot the error 
 ```{r error_estimates}
-ggplot(singular_value, aes(x = rank, y = error_estimate)) + geom_point(size=1, alpha=0.6) + ylab("Error estimate") + xlab("Rank") 
+ggplot(all, aes(x = rank, y = error_estimate, color=matrix)) + geom_point(size=1, alpha=0.6) + ylab("Error estimate") + xlab("Rank") + theme(legend.title=element_blank())
 ```
 
 ```{r available_nsv}
-nsv <- sum(singular_value$error_estimate < 0.5)
+nsv <- sum(svals_sampled$error_estimate < 0.5)
 nsv
-singular_value$error_estimate[nsv]
-singular_value$error_estimate[nsv+1]
+svals_sampled$error_estimate[nsv]
+svals_sampled$error_estimate[nsv+1]
 ```
 
 ### Singular values 
 
 Plotting the singular value
 ```{r singular_value_plot}
-ggplot(singular_value, aes(x = rank, y = singular_value)) + geom_point(size=1, alpha=0.6) + ylab("Singular value") + xlab("Rank") 
+ggplot(all, aes(x = rank, y = singular_value, color=matrix)) + geom_point(size=1, alpha=0.6) + ylab("Singular value") + xlab("Rank") + theme(legend.title=element_blank())
 ```
 
 As expected in this sanity check, it's a downward curve that drops in tangential slope sharply after the first few singular value. 
 
+### Coverage 
+
+```{r coverage}
+coverage_sampled <- read.table("tf_nsv_2000_0.1_coverage.txt", header=TRUE)
+coverage_full <- read.table("tf_nsv_2000_coverage.txt", header=TRUE)
+coverage_sampled$matrix <- factor("sampled matrix")
+coverage_full$matrix <- factor("full matrix")
+all <- rbind(coverage_full, coverage_sampled)
+ggplot(all, aes(x = nsv, y = coverage, color=matrix)) + geom_point(size=1, alpha=0.6) + ylab("Singular value") + xlab("nsv") + theme(legend.title=element_blank())
+```
+
+
 ### Conclusion
 
 From the error estimation, we'll be using about `r nsv` nsv to run GraphLab on our original big matrix.  
+
+And the result is shown as the overlap graph. 
 
