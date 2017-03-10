@@ -263,7 +263,7 @@ This is to see how long the calculation takes. So it looks like using cosine fun
 
 ```r
 ggplot(all_result_means, aes(x=nsv, y=meanTime, colour=distFunc)) + geom_point() + facet_grid(matrixType ~ .) + 
-  labs(x="number of singular values", y="average time")  + scale_colour_brewer(palette="Set2") + theme(legend.title=element_blank())
+  labs(x="number of singular values", y="average time (seconds)")  + scale_colour_brewer(palette="Set2") + theme(legend.title=element_blank())
 ```
 
 ![](analysis_top10_files/figure-html/unnamed-chunk-12-1.png)<!-- -->

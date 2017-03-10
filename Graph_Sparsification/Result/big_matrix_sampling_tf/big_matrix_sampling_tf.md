@@ -81,7 +81,7 @@ coverage_full <- read.table("tf_nsv_2000_coverage.txt", header=TRUE)
 coverage_sampled$matrix <- factor("sampled matrix")
 coverage_full$matrix <- factor("full matrix")
 all <- rbind(coverage_full, coverage_sampled)
-ggplot(all, aes(x = nsv, y = coverage, color=matrix)) + geom_point(size=1, alpha=0.6) + ylab("Singular value") + xlab("nsv") + theme(legend.title=element_blank())
+ggplot(all, aes(x = nsv, y = coverage, color=matrix)) + geom_point(size=1, alpha=0.6) + ylab("Coverage") + xlab("# singular values") + theme(legend.title=element_blank())
 ```
 
 ![](big_matrix_sampling_tf_files/figure-markdown_github/coverage-1.png)
