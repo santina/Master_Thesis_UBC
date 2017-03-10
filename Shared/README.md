@@ -6,8 +6,6 @@ This directory contains python code that are shared among different experiments,
 - GENIAtagger
   - For tagging medical terms.
 - GENIAtagger Python Wrapper
-- LingPipe
-  - For breaking paragraphs into sentences.
 - GraphLab
   - For performing SVD and outputting decomposed matrices
 - CosineSimilarity
