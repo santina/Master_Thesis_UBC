@@ -1,0 +1,4 @@
+#!/bin/bash
+
+
+nohuplus ./track_release -nV:13194164 -eigen-values:/projects/slin_prj/Medline/Graphlab_outputs/full_matrix_tfidf_2000/out.2000.singular_values -only-these:/projects/slin_prj/PubMed_Experiment/big_matrix/line_numbers_targets/all -record-these:/projects/slin_prj/PubMed_Experiment/big_matrix/line_numbers_targets/all -vectors:/projects/slin_prj/Medline/Graphlab_outputs/full_matrix_tfidf_2000/out.2000.U.1_of_1 -dim:200 -track:13194164 -block-size:500000 -prefix:./log/log 

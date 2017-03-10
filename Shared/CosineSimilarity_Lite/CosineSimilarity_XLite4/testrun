@@ -1,0 +1,9 @@
+#!/bin/bash
+
+
+mv ./test_maxq ./test_maxq-$(tag)
+mkdir ./test_maxq
+./track_release -nV:12440 -eigen-values:/projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.singular_values -vectors:/projects/slin_prj/PubMed_Experiment/random_100_pubmed/GraphLab_SVD_outputs/term_freq/out.4000.U.1_of_1 -only-these:/projects/slin_prj/CosineSimilarity_XLite2/test_line_nums -record-these:/projects/slin_prj/CosineSimilarity_XLite2/test_line_nums -dim:100 -track:101 -block-size:1000 -prefix:./test_maxq/test_maxq
+
+echo "OK"
+ 
